@@ -1,0 +1,98 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/bookings"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Paiement</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Chargement des informations de paiement...</p>
+  </div>
+
+  <div *ngIf="!isLoading && (booking$ | async) as bookingData">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Récapitulatif de la réservation</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item lines="none" *ngIf="(service$ | async) as service">
+          <ion-thumbnail slot="start" *ngIf="service.images && service.images.length">
+            <img [src]="service.images[0]" alt="{{ service.title }}">
+          </ion-thumbnail>
+          <ion-label>
+            <h2>{{ service.title }}</h2>
+            <p>{{ service.description | slice:0:100 }}{{ service.description.length > 100 ? '...' : '' }}</p>
+          </ion-label>
+        </ion-item>
+
+        <ion-list lines="none">
+          <ion-item>
+            <ion-icon name="calendar-outline" slot="start" color="primary"></ion-icon>
+            <ion-label>
+              <h3>Date</h3>
+              <p>{{ bookingData.booking?.date | date:'dd/MM/yyyy à HH:mm' }}</p>
+            </ion-label>
+          </ion-item>
+
+          <ion-item *ngIf="(provider$ | async) as provider">
+            <ion-icon name="person-outline" slot="start" color="secondary"></ion-icon>
+            <ion-label>
+              <h3>Prestataire</h3>
+              <p>{{ provider.displayName }}</p>
+            </ion-label>
+          </ion-item>
+
+          <ion-item>
+            <ion-icon name="cash-outline" slot="start" color="success"></ion-icon>
+            <ion-label>
+              <h3>Montant total</h3>
+              <p class="price">{{ bookingData.booking?.totalPrice | currency:'DZD':'symbol':'1.0-0' }}</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Sélecteur de méthode de paiement -->
+    <app-payment-method-selector 
+      [amount]="bookingData.booking?.totalPrice || 0" 
+      [showWalletOption]="true"
+      (methodSelected)="onMethodSelected($event)">
+    </app-payment-method-selector>
+
+    <!-- Bouton de paiement -->
+    <div class="payment-actions">
+      <ion-button expand="block" (click)="processPayment()" [disabled]="isProcessing">
+        <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+        {{ isProcessing ? 'Traitement en cours...' : 'Confirmer le paiement' }}
+      </ion-button>
+      
+      <ion-button expand="block" fill="outline" routerLink="/bookings" [disabled]="isProcessing">
+        <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+        Annuler
+      </ion-button>
+    </div>
+
+    <!-- Message de succès -->
+    <ion-card *ngIf="paymentSuccess" class="success-card">
+      <ion-card-content>
+        <ion-icon name="checkmark-circle" color="success"></ion-icon>
+        <h2>Paiement réussi !</h2>
+        <p>Votre réservation a été confirmée. Vous allez être redirigé vers les détails de votre réservation.</p>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Message d'erreur -->
+    <ion-card *ngIf="paymentError" class="error-card">
+      <ion-card-content>
+        <ion-icon name="alert-circle" color="danger"></ion-icon>
+        <h2>Erreur de paiement</h2>
+        <p>{{ paymentError }}</p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

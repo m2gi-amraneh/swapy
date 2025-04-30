@@ -1,0 +1,53 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Notifications</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="clearAllNotifications()" *ngIf="(notifications$ | async)?.length">
+        <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="isLoading" class="ion-padding ion-text-center">
+    <ion-spinner></ion-spinner>
+    <p>Chargement des notifications...</p>
+  </div>
+
+  <ion-list *ngIf="!isLoading">
+    <ng-container *ngIf="(notifications$ | async) as notifications">
+      <div *ngIf="notifications.length === 0" class="ion-padding ion-text-center empty-state">
+        <ion-icon name="notifications-off-outline" size="large"></ion-icon>
+        <h2>Aucune notification</h2>
+        <p>Vous n'avez pas encore reçu de notifications.</p>
+      </div>
+
+      <ion-item-sliding *ngFor="let notification of notifications">
+        <ion-item 
+          [routerLink]="getNotificationRoute(notification)" 
+          (click)="markAsRead(notification)"
+          [class.unread]="!notification.read">
+          <ion-avatar slot="start" class="notification-icon">
+            <ion-icon [name]="getNotificationIcon(notification.type)" color="primary"></ion-icon>
+          </ion-avatar>
+          <ion-label>
+            <h2>{{ notification.title }}</h2>
+            <p>{{ notification.message }}</p>
+            <div class="notification-time">{{ getTimeAgo(notification.createdAt) }}</div>
+          </ion-label>
+          <ion-badge *ngIf="!notification.read" color="primary" slot="end"></ion-badge>
+        </ion-item>
+        
+        <ion-item-options side="end">
+          <ion-item-option color="danger" (click)="deleteNotification(notification)">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+    </ng-container>
+  </ion-list>
+</ion-content>

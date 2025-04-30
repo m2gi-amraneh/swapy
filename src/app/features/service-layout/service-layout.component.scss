@@ -1,0 +1,38 @@
+ion-header {
+  ion-toolbar {
+    --background: var(--ion-color-primary);
+    --color: var(--ion-color-primary-contrast);
+    
+    ion-buttons {
+      ion-button {
+        --color: var(--ion-color-primary-contrast);
+      }
+    }
+    
+    ion-title {
+      font-weight: 600;
+    }
+  }
+}
+
+ion-content {
+  --background: var(--ion-color-light);
+}
+
+ion-footer {
+  ion-tab-bar {
+    --background: var(--ion-color-light);
+    border-top: 1px solid var(--ion-color-light-shade);
+    
+    ion-tab-button {
+      --color: var(--ion-color-medium);
+      --color-selected: var(--ion-color-primary);
+      
+      &.tab-selected {
+        ion-icon, ion-label {
+          color: var(--ion-color-primary);
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,64 @@
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  
+  ion-spinner {
+    margin-bottom: 16px;
+  }
+  
+  p {
+    color: var(--ion-color-medium);
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  text-align: center;
+  
+  ion-icon {
+    font-size: 64px;
+    color: var(--ion-color-medium);
+    margin-bottom: 16px;
+  }
+  
+  h3 {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+  
+  p {
+    color: var(--ion-color-medium);
+    margin-bottom: 24px;
+  }
+  
+  ion-button {
+    max-width: 240px;
+  }
+}
+
+.price {
+  float: right;
+  font-weight: bold;
+  margin-left: 8px;
+}
+
+ion-segment {
+  --background: var(--ion-color-light);
+  
+  ion-segment-button {
+    --indicator-color: var(--ion-color-primary);
+    --color-checked: var(--ion-color-primary);
+    --color: var(--ion-color-medium);
+    
+    ion-label {
+      font-size: 12px;
+    }
+  }
+}

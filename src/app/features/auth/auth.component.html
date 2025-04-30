@@ -1,0 +1,22 @@
+<ion-content>
+  <div class="auth-container">
+    <div class="logo-container">
+      <img src="assets/logo.png" alt="Logo" class="logo">
+      <h1>Services Marketplace</h1>
+    </div>
+
+    <ion-segment [(ngModel)]="segment" (ionChange)="segmentChanged($event)" mode="ios">
+      <ion-segment-button value="login">
+        <ion-label>Connexion</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="register">
+        <ion-label>Inscription</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+    <div class="auth-content">
+      <app-login *ngIf="segment === 'login'"></app-login>
+      <app-register *ngIf="segment === 'register'"></app-register>
+    </div>
+  </div>
+</ion-content>

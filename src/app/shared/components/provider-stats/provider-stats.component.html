@@ -1,0 +1,156 @@
+<ion-card *ngIf="stats$ | async as stats">
+  <ion-card-header>
+    <ion-card-title>
+      <ion-text color="primary">Statistiques du prestataire</ion-text>
+    </ion-card-title>
+  </ion-card-header>
+
+  <ion-card-content>
+    <ion-grid>
+      <!-- Première ligne de statistiques -->
+      <ion-row>
+        <ion-col size="6" size-md="3">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <ion-icon name="briefcase" color="primary"></ion-icon>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ stats.totalServices }}</div>
+              <div class="stat-label">Services totaux</div>
+            </div>
+          </div>
+        </ion-col>
+        
+        <ion-col size="6" size-md="3">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <ion-icon name="checkmark-circle" color="success"></ion-icon>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ stats.activeServices }}</div>
+              <div class="stat-label">Services actifs</div>
+            </div>
+          </div>
+        </ion-col>
+        
+        <ion-col size="6" size-md="3">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <ion-icon name="eye" color="tertiary"></ion-icon>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ stats.totalViews }}</div>
+              <div class="stat-label">Vues totales</div>
+            </div>
+          </div>
+        </ion-col>
+        
+        <ion-col size="6" size-md="3">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <ion-icon name="calendar" color="warning"></ion-icon>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ stats.totalBookings }}</div>
+              <div class="stat-label">Réservations</div>
+            </div>
+          </div>
+        </ion-col>
+      </ion-row>
+      
+      <!-- Deuxième ligne de statistiques -->
+      <ion-row class="ion-margin-top">
+        <ion-col size="12" size-md="6">
+          <ion-card class="inner-card">
+            <ion-card-header>
+              <ion-card-subtitle>Satisfaction client</ion-card-subtitle>
+            </ion-card-header>
+            <ion-card-content>
+              <div class="rating-stats">
+                <div class="rating-value">
+                  <span [ngClass]="'rating-' + getRatingColor(stats.averageRating)">
+                    {{ stats.averageRating.toFixed(1) }}
+                  </span>
+                  <ion-icon name="star" color="warning"></ion-icon>
+                </div>
+                <div class="rating-count">
+                  {{ stats.totalReviews }} avis
+                </div>
+              </div>
+              
+              <div class="completion-rate">
+                <div class="completion-label">
+                  Taux de complétion
+                </div>
+                <ion-progress-bar 
+                  [value]="stats.completionRate" 
+                  [color]="getCompletionRateColor(stats.completionRate)">
+                </ion-progress-bar>
+                <div class="completion-value">
+                  {{ formatPercentage(stats.completionRate) }}
+                </div>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        
+        <ion-col size="12" size-md="6">
+          <ion-card class="inner-card">
+            <ion-card-header>
+              <ion-card-subtitle>Revenus</ion-card-subtitle>
+            </ion-card-header>
+            <ion-card-content>
+              <div class="revenue-stats">
+                <div class="revenue-item">
+                  <div class="revenue-label">Aujourd'hui</div>
+                  <div class="revenue-value">{{ formatCurrency(stats.revenueStats.daily) }}</div>
+                </div>
+                <div class="revenue-item">
+                  <div class="revenue-label">Cette semaine</div>
+                  <div class="revenue-value">{{ formatCurrency(stats.revenueStats.weekly) }}</div>
+                </div>
+                <div class="revenue-item">
+                  <div class="revenue-label">Ce mois</div>
+                  <div class="revenue-value">{{ formatCurrency(stats.revenueStats.monthly) }}</div>
+                </div>
+                <div class="revenue-item total">
+                  <div class="revenue-label">Total</div>
+                  <div class="revenue-value">{{ formatCurrency(stats.revenueStats.total) }}</div>
+                </div>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+      
+      <!-- Troisième ligne - Catégories -->
+      <ion-row *ngIf="categoryLabels.length > 0" class="ion-margin-top">
+        <ion-col size="12">
+          <ion-card class="inner-card">
+            <ion-card-header>
+              <ion-card-subtitle>Services par catégorie</ion-card-subtitle>
+            </ion-card-header>
+            <ion-card-content>
+              <div class="category-stats">
+                <div *ngFor="let category of categoryLabels; let i = index" class="category-item">
+                  <div class="category-name">{{ category }}</div>
+                  <ion-progress-bar [value]="categoryData[i] / getMaxCategoryValue()" color="tertiary"></ion-progress-bar>
+                  <div class="category-count">{{ categoryData[i] }}</div>
+                </div>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-card-content>
+</ion-card>
+
+<ion-card *ngIf="!(stats$ | async)">
+  <ion-card-content>
+    <div class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Chargement des statistiques...</p>
+    </div>
+  </ion-card-content>
+</ion-card>

@@ -1,0 +1,142 @@
+.chat-header {
+  display: flex;
+  align-items: center;
+  
+  ion-avatar {
+    width: 32px;
+    height: 32px;
+    margin-right: 10px;
+  }
+  
+  .user-info {
+    display: flex;
+    flex-direction: column;
+    
+    h2 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 500;
+    }
+    
+    p {
+      margin: 0;
+      font-size: 12px;
+      color: var(--ion-color-success);
+    }
+  }
+}
+
+.message-container {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.message-group {
+  margin-bottom: 8px;
+}
+
+.message {
+  max-width: 80%;
+  padding: 10px 12px;
+  border-radius: 18px;
+  position: relative;
+  margin-bottom: 2px;
+  
+  &.message-sent {
+    align-self: flex-end;
+    margin-left: auto;
+    background-color: var(--ion-color-primary);
+    color: white;
+    border-bottom-right-radius: 4px;
+    
+    .message-time {
+      color: rgba(255, 255, 255, 0.7);
+    }
+  }
+  
+  &.message-received {
+    align-self: flex-start;
+    background-color: var(--ion-color-light);
+    color: var(--ion-color-dark);
+    border-bottom-left-radius: 4px;
+    
+    .message-time {
+      color: var(--ion-color-medium);
+    }
+  }
+  
+  .message-content {
+    margin-bottom: 4px;
+    word-break: break-word;
+  }
+  
+  .message-time {
+    font-size: 11px;
+    text-align: right;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    
+    ion-icon {
+      margin-left: 4px;
+      font-size: 14px;
+      
+      &.read-status {
+        color: var(--ion-color-success);
+      }
+    }
+  }
+}
+
+.empty-messages, .loading-messages {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--ion-color-medium);
+  text-align: center;
+  padding: 20px;
+  
+  ion-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+  
+  p {
+    font-size: 16px;
+  }
+}
+
+.message-input-container {
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  
+  .message-input {
+    --padding-start: 16px;
+    --padding-end: 16px;
+    --padding-top: 10px;
+    --padding-bottom: 10px;
+    --background: var(--ion-color-light);
+    --border-radius: 24px;
+    margin-right: 8px;
+  }
+  
+  ion-button {
+    --padding-start: 0;
+    --padding-end: 0;
+    --padding-top: 0;
+    --padding-bottom: 0;
+    --box-shadow: none;
+    height: 40px;
+    width: 40px;
+    
+    ion-icon {
+      font-size: 24px;
+    }
+  }
+}

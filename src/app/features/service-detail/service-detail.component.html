@@ -1,0 +1,137 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/services"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Détails du Service</ion-title>
+    <ion-buttons slot="end" *ngIf="isCurrentUserProvider && service">
+      <ion-button (click)="onEditService(service.id)">
+        <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ng-container *ngIf="service$ | async as service; else loading">
+    <!-- Galerie d'images -->
+    <div class="image-gallery">
+      <div class="main-image">
+        <ion-button fill="clear" class="nav-button prev" (click)="previousImage()">
+          <ion-icon name="chevron-back-outline"></ion-icon>
+        </ion-button>
+        
+        <img [src]="service.images && service.images.length > 0 ? service.images[selectedImageIndex] : 'assets/default-service.jpg'" [alt]="service.title">
+        
+        <ion-button fill="clear" class="nav-button next" (click)="nextImage()">
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </ion-button>
+      </div>
+      
+      <div class="thumbnails" *ngIf="service.images && service.images.length > 1">
+        <div 
+          *ngFor="let image of service.images; let i = index"
+          class="thumbnail"
+          [class.active]="i === selectedImageIndex"
+          (click)="selectImage(i)">
+          <img [src]="image" [alt]="service.title + ' image ' + (i + 1)">
+        </div>
+      </div>
+    </div>
+
+    <!-- Informations du service -->
+    <div class="service-info">
+      <h1>{{ service.title }}</h1>
+      
+      <div class="price-rating">
+        <ion-text color="primary" class="price">
+          {{ formatPrice(service.price) }}
+        </ion-text>
+        
+        <div class="rating" *ngIf="service.rating">
+          <ion-icon name="star" color="warning"></ion-icon>
+          <span>{{ service.rating.toFixed(1) }}</span>
+          <small>({{ service.reviewCount || 0 }} avis)</small>
+        </div>
+      </div>
+
+      <div class="category-location">
+        <ion-chip>
+          <ion-icon name="pricetag"></ion-icon>
+          <ion-label>{{ service.category }}</ion-label>
+        </ion-chip>
+        
+        <ion-chip>
+          <ion-icon name="location"></ion-icon>
+          <ion-label>{{ service.location }}</ion-label>
+        </ion-chip>
+      </div>
+
+      <div class="description">
+        <h2>Description</h2>
+        <p>{{ service.description }}</p>
+      </div>
+
+      <!-- Informations du prestataire -->
+      <ng-container *ngIf="provider$ | async as provider">
+        <div class="provider-info">
+          <h2>À propos du prestataire</h2>
+          
+          <div class="provider-card" [routerLink]="['/provider', provider.uid]">
+            <ion-avatar>
+              <img [src]="provider.photoURL || 'assets/default-avatar.png'" [alt]="provider.displayName">
+            </ion-avatar>
+            
+            <div class="provider-details">
+              <h3>{{ provider.displayName }}</h3>
+              <p>{{ provider.businessName || 'Prestataire' }}</p>
+            </div>
+            
+            <ion-button fill="clear">
+              <ion-icon name="chevron-forward" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Actions -->
+      <div class="action-buttons" *ngIf="!isCurrentUserProvider">
+        <ion-button expand="block" (click)="onBookNow(service.id)">
+          <ion-icon name="calendar" slot="start"></ion-icon>
+          Réserver maintenant
+        </ion-button>
+        
+        <ion-button expand="block" fill="outline" (click)="onContactProvider(service.providerId)">
+          <ion-icon name="chatbubble" slot="start"></ion-icon>
+          Contacter le prestataire
+        </ion-button>
+      </div>
+
+      <!-- Avis -->
+      <div class="reviews-section">
+        <h2>Avis des clients</h2>
+        <app-user-reviews [providerId]="service.providerId"></app-user-reviews>
+      </div>
+
+      <!-- Services similaires -->
+      <div class="similar-services" *ngIf="similarServices$ | async as similarServices">
+        <h2>Services similaires</h2>
+        <div class="services-grid">
+          <app-service-card
+            *ngFor="let similarService of similarServices"
+            [service]="similarService"
+            class="service-card">
+          </app-service-card>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- État de chargement -->
+  <ng-template #loading>
+    <div class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Chargement du service...</p>
+    </div>
+  </ng-template>
+</ion-content>

@@ -1,0 +1,23 @@
+<div class="stats-container">
+  <ng-container *ngIf="!isLoading; else loading">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>
+          <ion-text color="primary">Statistiques du prestataire</ion-text>
+        </ion-card-title>
+        <ion-card-subtitle>Aperçu de vos performances</ion-card-subtitle>
+      </ion-card-header>
+      
+      <ion-card-content>
+        <app-provider-stats [providerId]="providerId"></app-provider-stats>
+      </ion-card-content>
+    </ion-card>
+  </ng-container>
+  
+  <ng-template #loading>
+    <div class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Chargement des statistiques...</p>
+    </div>
+  </ng-template>
+</div>

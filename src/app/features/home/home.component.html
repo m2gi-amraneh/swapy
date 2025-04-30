@@ -1,0 +1,157 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      <div class="app-logo">
+        <img src="assets/logo.png" alt="Logo" />
+        <span>Algerian Services</span>
+      </div>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button routerLink="/notifications">
+        <ion-icon name="notifications-outline"></ion-icon>
+      </ion-button>
+      <ion-button routerLink="/wallet">
+        <ion-icon name="wallet-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Bannière principale -->
+  <div class="hero-banner">
+    <h1>Trouvez les meilleurs services en Algérie</h1>
+    <p>Des professionnels qualifiés à votre service</p>
+    <div class="search-container">
+      <app-service-search (search)="onSearch($event)"></app-service-search>
+    </div>
+  </div>
+
+  <!-- Catégories -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Catégories</h2>
+      <ion-button fill="clear" routerLink="/services">Voir tout</ion-button>
+    </div>
+
+    <div class="categories-container">
+      <ion-grid>
+        <ion-row>
+          <ion-col size="4" *ngFor="let category of categories">
+            <div
+              class="category-card"
+              [routerLink]="['/services']"
+              [queryParams]="{ category: category.name }"
+            >
+              <div class="category-icon">
+                <ion-icon [name]="category.icon || 'grid-outline'"></ion-icon>
+              </div>
+              <div class="category-name">{{ category.name }}</div>
+            </div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
+      <div *ngIf="isLoading" class="loading-container">
+        <ion-skeleton-text
+          animated
+          style="width: 100%; height: 80px"
+        ></ion-skeleton-text>
+        <ion-skeleton-text
+          animated
+          style="width: 100%; height: 80px"
+        ></ion-skeleton-text>
+      </div>
+    </div>
+  </div>
+
+  <!-- Services en vedette -->
+  <div class="section">
+    <div class="section-header">
+      <h2>En vedette</h2>
+      <ion-button fill="clear" routerLink="/services">Voir tout</ion-button>
+    </div>
+
+    <div class="services-container">
+      <ng-container
+        *ngIf="featuredServices$ | async as services; else loadingServices"
+      >
+        <div *ngIf="services.length > 0; else noServices" class="services-grid">
+          <app-service-card
+            *ngFor="let service of services"
+            [service]="service"
+          >
+          </app-service-card>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <!-- Services populaires -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Les plus populaires</h2>
+      <ion-button fill="clear" routerLink="/services">Voir tout</ion-button>
+    </div>
+
+    <div class="services-container">
+      <ng-container
+        *ngIf="popularServices$ | async as services; else loadingServices"
+      >
+        <div *ngIf="services.length > 0; else noServices" class="services-grid">
+          <app-service-card
+            *ngFor="let service of services"
+            [service]="service"
+          >
+          </app-service-card>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <!-- Services récents -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Ajoutés récemment</h2>
+      <ion-button fill="clear" routerLink="/services">Voir tout</ion-button>
+    </div>
+
+    <div class="services-container">
+      <ng-container
+        *ngIf="recentServices$ | async as services; else loadingServices"
+      >
+        <div *ngIf="services.length > 0; else noServices" class="services-grid">
+          <app-service-card
+            *ngFor="let service of services"
+            [service]="service"
+          >
+          </app-service-card>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <ng-template #loadingServices>
+    <div class="loading-container">
+      <ion-skeleton-text
+        animated
+        style="width: 100%; height: 200px"
+      ></ion-skeleton-text>
+      <ion-skeleton-text
+        animated
+        style="width: 100%; height: 200px"
+      ></ion-skeleton-text>
+    </div>
+  </ng-template>
+
+  <ng-template #noServices>
+    <div class="no-services">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <p>Aucun service disponible</p>
+    </div>
+  </ng-template>
+</ion-content>

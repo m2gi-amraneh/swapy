@@ -1,0 +1,175 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/services"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Paiement</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ng-container *ngIf="bookingDetails$ | async as details; else loading">
+    <!-- Récapitulatif de la réservation -->
+    <div class="booking-summary">
+      <h2>Récapitulatif de la réservation</h2>
+      
+      <ion-card>
+        <ion-card-content>
+          <div class="service-info">
+            <h3>{{ details.service.title }}</h3>
+            <p class="category">
+              <ion-icon name="pricetag-outline"></ion-icon>
+              {{ details.service.category }}
+            </p>
+            
+            <div class="booking-details">
+              <p>
+                <ion-icon name="calendar-outline"></ion-icon>
+                <span>Date: {{ details.booking.date | date:'dd MMMM yyyy' }}</span>
+              </p>
+              <p>
+                <ion-icon name="time-outline"></ion-icon>
+                <span>Heure: {{ details.booking.timeSlot }}</span>
+              </p>
+              <p>
+                <ion-icon name="location-outline"></ion-icon>
+                <span>Adresse: {{ details.booking.address }}</span>
+              </p>
+            </div>
+            
+            <div class="price-container">
+              <span class="label">Montant total:</span>
+              <span class="price">{{ formatPrice(details.service.price) }}</span>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Formulaire de paiement -->
+    <div class="payment-form" *ngIf="!paymentSuccess">
+      <h2>Choisissez votre méthode de paiement</h2>
+      
+      <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
+        <!-- Sélection de la méthode de paiement -->
+        <ion-radio-group formControlName="paymentMethod">
+          <ion-item *ngFor="let method of paymentMethods" lines="full" [disabled]="method.value === 'wallet' && isWalletPaymentDisabled(details.service.price)">
+            <ion-label>
+              <div class="payment-method">
+                <ion-icon [name]="method.icon"></ion-icon>
+                <span>{{ method.label }}</span>
+                <span *ngIf="method.value === 'wallet'" class="wallet-balance">
+                  (Solde: {{ formatPrice(walletBalance) }})
+                </span>
+              </div>
+            </ion-label>
+            <ion-radio [value]="method.value" slot="start"></ion-radio>
+          </ion-item>
+        </ion-radio-group>
+
+        <!-- Champs pour carte bancaire -->
+        <div *ngIf="selectedMethod === 'card'" class="card-fields">
+          <ion-item>
+            <ion-label position="floating">Numéro de carte</ion-label>
+            <ion-input formControlName="cardNumber" type="text" inputmode="numeric" maxlength="16"></ion-input>
+          </ion-item>
+          
+          <div class="card-details">
+            <ion-item>
+              <ion-label position="floating">Date d'expiration (MM/YY)</ion-label>
+              <ion-input formControlName="cardExpiry" type="text" maxlength="5"></ion-input>
+            </ion-item>
+            
+            <ion-item>
+              <ion-label position="floating">CVV</ion-label>
+              <ion-input formControlName="cardCvv" type="password" maxlength="4"></ion-input>
+            </ion-item>
+          </div>
+          
+          <ion-item lines="none">
+            <ion-checkbox formControlName="savePaymentInfo"></ion-checkbox>
+            <ion-label class="ion-padding-start">Enregistrer cette carte pour les prochains paiements</ion-label>
+          </ion-item>
+        </div>
+
+        <!-- Champs pour BaridiMob/EDAHABIA -->
+        <div *ngIf="selectedMethod === 'baridiMob' || selectedMethod === 'edahabia'" class="mobile-fields">
+          <ion-item>
+            <ion-label position="floating">Numéro de téléphone</ion-label>
+            <ion-input formControlName="phoneNumber" type="tel" placeholder="Ex: 0551234567"></ion-input>
+          </ion-item>
+          
+          <ion-note>
+            <ion-icon name="information-circle-outline"></ion-icon>
+            Vous serez redirigé vers l'application {{ selectedMethod === 'baridiMob' ? 'BaridiMob' : 'EDAHABIA' }} pour finaliser votre paiement.
+          </ion-note>
+        </div>
+
+        <!-- Champs pour paiement en espèces -->
+        <div *ngIf="selectedMethod === 'cash'" class="cash-fields">
+          <ion-note>
+            <ion-icon name="information-circle-outline"></ion-icon>
+            Le paiement sera effectué directement au prestataire lors de la réalisation du service.
+          </ion-note>
+        </div>
+
+        <!-- Champs pour portefeuille électronique -->
+        <div *ngIf="selectedMethod === 'wallet'" class="wallet-fields">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Votre portefeuille</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <div class="wallet-info">
+                <div class="balance-info">
+                  <span class="label">Solde disponible:</span>
+                  <span class="balance" [ngClass]="{'insufficient': walletBalance < details.service.price}">
+                    {{ formatPrice(walletBalance) }}
+                  </span>
+                </div>
+                <div class="transaction-info">
+                  <span class="label">Montant de la transaction:</span>
+                  <span class="amount">{{ formatPrice(details.service.price) }}</span>
+                </div>
+                <div *ngIf="walletBalance < details.service.price" class="insufficient-funds">
+                  <ion-icon name="alert-circle-outline"></ion-icon>
+                  <span>Solde insuffisant. Veuillez recharger votre portefeuille.</span>
+                  <ion-button fill="outline" size="small" [routerLink]="['/wallet']">
+                    Recharger mon portefeuille
+                  </ion-button>
+                </div>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </div>
+
+        <!-- Message d'erreur -->
+        <div *ngIf="paymentError" class="error-message">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <span>{{ paymentError }}</span>
+        </div>
+
+        <!-- Bouton de soumission -->
+        <ion-button expand="block" type="submit" [disabled]="!paymentForm.valid || isLoading || (selectedMethod === 'wallet' && walletBalance < details.service.price)">
+          <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+          <span *ngIf="!isLoading">Confirmer le paiement</span>
+        </ion-button>
+      </form>
+    </div>
+
+    <!-- Message de succès -->
+    <div *ngIf="paymentSuccess" class="success-message">
+      <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
+      <h2>Paiement initié avec succès!</h2>
+      <p>Vous allez être redirigé vers la page de confirmation...</p>
+    </div>
+  </ng-container>
+
+  <!-- État de chargement -->
+  <ng-template #loading>
+    <div class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Chargement des informations de paiement...</p>
+    </div>
+  </ng-template>
+</ion-content>

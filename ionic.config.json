@@ -1,0 +1,7 @@
+{
+  "name": "algerian-services-marketplace",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

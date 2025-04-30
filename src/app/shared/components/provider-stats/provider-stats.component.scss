@@ -1,0 +1,129 @@
+.stat-card {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background: var(--ion-color-light);
+  border-radius: var(--ion-border-radius);
+  margin-bottom: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  .stat-icon {
+    font-size: 24px;
+    margin-right: 12px;
+  }
+
+  .stat-content {
+    .stat-value {
+      font-size: 20px;
+      font-weight: bold;
+      color: var(--ion-color-dark);
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: var(--ion-color-medium);
+    }
+  }
+}
+
+.rating-stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+
+  .rating-value {
+    font-size: 24px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+
+    ion-icon {
+      margin-left: 4px;
+      font-size: 20px;
+    }
+  }
+
+  .rating-count {
+    font-size: 14px;
+    color: var(--ion-color-medium);
+  }
+}
+
+.completion-rate {
+  margin-top: 16px;
+
+  .completion-label {
+    font-size: 14px;
+    color: var(--ion-color-medium);
+    margin-bottom: 8px;
+  }
+
+  .completion-value {
+    font-size: 14px;
+    text-align: right;
+    color: var(--ion-color-dark);
+    margin-top: 4px;
+  }
+}
+
+.revenue-stats {
+  .revenue-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+
+    .revenue-label {
+      font-size: 14px;
+      color: var(--ion-color-medium);
+    }
+
+    .revenue-value {
+      font-size: 16px;
+      font-weight: bold;
+      color: var(--ion-color-dark);
+    }
+  }
+
+  .total {
+    font-weight: bold;
+    border-top: 1px solid var(--ion-color-light);
+    padding-top: 8px;
+    margin-top: 8px;
+  }
+}
+
+.category-stats {
+  .category-item {
+    margin-bottom: 12px;
+
+    .category-name {
+      font-size: 14px;
+      color: var(--ion-color-medium);
+      margin-bottom: 4px;
+    }
+
+    .category-count {
+      font-size: 14px;
+      text-align: right;
+      color: var(--ion-color-dark);
+    }
+  }
+}
+
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 32px;
+
+  ion-spinner {
+    margin-bottom: 16px;
+  }
+
+  p {
+    font-size: 16px;
+    color: var(--ion-color-medium);
+  }
+}

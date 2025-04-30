@@ -1,0 +1,134 @@
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>
+      <ion-text color="primary">Avis des clients</ion-text>
+    </ion-card-title>
+    <ion-card-subtitle>
+      <ng-container *ngIf="(reviews$ | async)?.length; else noReviews">
+        {{ (reviews$ | async)?.length }} avis
+      </ng-container>
+      <ng-template #noReviews>
+        Aucun avis pour le moment
+      </ng-template>
+    </ion-card-subtitle>
+  </ion-card-header>
+
+  <ion-card-content>
+    <!-- Liste des avis -->
+    <ion-list *ngIf="(reviews$ | async)?.length; else emptyReviews">
+      <ion-item *ngFor="let review of reviews$ | async" lines="full" class="review-item">
+        <ion-grid>
+          <ion-row>
+            <ion-col size="12">
+              <div class="review-header">
+                <div class="rating">
+                  <ion-icon 
+                    *ngFor="let star of getStarsArray(review.rating)" 
+                    [name]="star ? 'star' : 'star-outline'" 
+                    color="warning">
+                  </ion-icon>
+                </div>
+                <ion-text color="medium" class="date">
+                  {{ formatDate(review.createdAt) }}
+                </ion-text>
+              </div>
+            </ion-col>
+          </ion-row>
+          
+          <ion-row>
+            <ion-col size="12">
+              <ion-text>
+                <p class="review-comment">{{ review.comment }}</p>
+              </ion-text>
+            </ion-col>
+          </ion-row>
+          
+          <!-- Actions -->
+          <ion-row class="review-actions">
+            <ion-col size="auto">
+              <ion-button fill="clear" size="small" (click)="likeReview(review.id)">
+                <ion-icon slot="start" name="thumbs-up"></ion-icon>
+                {{ review.likes || 0 }}
+              </ion-button>
+            </ion-col>
+          </ion-row>
+          
+          <!-- Réponse du prestataire -->
+          <ion-row *ngIf="review.response" class="provider-response">
+            <ion-col>
+              <ion-item lines="none" class="response-item">
+                <ion-label>
+                  <h3>Réponse du prestataire</h3>
+                  <p>{{ review.response.comment }}</p>
+                  <ion-text color="medium" class="response-date">
+                    {{ formatDate(review.response.createdAt) }}
+                  </ion-text>
+                </ion-label>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+          
+          <!-- Formulaire de réponse pour le prestataire -->
+          <ion-row *ngIf="currentUserId === providerId && !review.response">
+            <ion-col>
+              <ion-item>
+                <ion-label position="stacked">Répondre à cet avis</ion-label>
+                <ion-textarea #responseText rows="3" placeholder="Votre réponse..."></ion-textarea>
+              </ion-item>
+              <ion-button 
+                expand="block" 
+                fill="outline" 
+                size="small" 
+                (click)="respondToReview(review.id, responseText.value || '')">
+                Répondre
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-item>
+    </ion-list>
+    
+    <ng-template #emptyReviews>
+      <div class="empty-reviews">
+        <ion-icon name="chatbubble-outline" size="large"></ion-icon>
+        <p>Aucun avis pour le moment</p>
+      </div>
+    </ng-template>
+    
+    <!-- Formulaire d'ajout d'avis -->
+    <div *ngIf="canReview" class="add-review-form">
+      <ion-item-divider>
+        <ion-label>Ajouter un avis</ion-label>
+      </ion-item-divider>
+      
+      <ion-item>
+        <ion-label position="stacked">Note</ion-label>
+        <div class="rating-input">
+          <ion-icon 
+            *ngFor="let star of [1, 2, 3, 4, 5]" 
+            [name]="star <= newRating ? 'star' : 'star-outline'" 
+            color="warning"
+            (click)="newRating = star">
+          </ion-icon>
+        </div>
+      </ion-item>
+      
+      <ion-item>
+        <ion-label position="stacked">Commentaire</ion-label>
+        <ion-textarea 
+          [(ngModel)]="newReview" 
+          rows="4" 
+          placeholder="Partagez votre expérience...">
+        </ion-textarea>
+      </ion-item>
+      
+      <ion-button 
+        expand="block" 
+        color="primary" 
+        [disabled]="!newReview || newRating === 0"
+        (click)="submitReview()">
+        Publier mon avis
+      </ion-button>
+    </div>
+  </ion-card-content>
+</ion-card>

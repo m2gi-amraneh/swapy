@@ -1,0 +1,23 @@
+<div class="reviews-container">
+  <ng-container *ngIf="!isLoading; else loading">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>
+          <ion-text color="primary">Avis des clients</ion-text>
+        </ion-card-title>
+        <ion-card-subtitle>Gérez les avis sur vos services</ion-card-subtitle>
+      </ion-card-header>
+      
+      <ion-card-content>
+        <app-user-reviews [providerId]="providerId"></app-user-reviews>
+      </ion-card-content>
+    </ion-card>
+  </ng-container>
+  
+  <ng-template #loading>
+    <div class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Chargement des avis...</p>
+    </div>
+  </ng-template>
+</div>

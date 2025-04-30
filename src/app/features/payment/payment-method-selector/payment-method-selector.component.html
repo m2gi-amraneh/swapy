@@ -1,0 +1,80 @@
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>Choisir une méthode de paiement</ion-card-title>
+    <ion-card-subtitle>Montant à payer: {{ amount | currency:'DZD':'symbol':'1.0-0' }}</ion-card-subtitle>
+  </ion-card-header>
+
+  <ion-card-content>
+    <ion-list>
+      <ion-radio-group [(ngModel)]="selectedMethod">
+        <!-- Option de paiement en espèces -->
+        <ion-item>
+          <ion-label>
+            <div class="payment-method">
+              <ion-icon name="cash-outline" color="success"></ion-icon>
+              <div class="method-details">
+                <h3>Paiement en espèces</h3>
+                <p>Payer en espèces lors de la prestation</p>
+              </div>
+            </div>
+          </ion-label>
+          <ion-radio slot="start" value="cash" (click)="selectMethod('cash')"></ion-radio>
+        </ion-item>
+
+        <!-- Option BaridiMob -->
+        <ion-item>
+          <ion-label>
+            <div class="payment-method">
+              <ion-icon name="phone-portrait-outline" color="primary"></ion-icon>
+              <div class="method-details">
+                <h3>BaridiMob</h3>
+                <p>Payer avec l'application BaridiMob</p>
+              </div>
+            </div>
+          </ion-label>
+          <ion-radio slot="start" value="baridiMob" (click)="selectMethod('baridiMob')"></ion-radio>
+        </ion-item>
+
+        <!-- Option EDAHABIA -->
+        <ion-item>
+          <ion-label>
+            <div class="payment-method">
+              <ion-icon name="card-outline" color="tertiary"></ion-icon>
+              <div class="method-details">
+                <h3>EDAHABIA</h3>
+                <p>Payer avec votre carte EDAHABIA</p>
+              </div>
+            </div>
+          </ion-label>
+          <ion-radio slot="start" value="edahabia" (click)="selectMethod('edahabia')"></ion-radio>
+        </ion-item>
+
+        <!-- Option Portefeuille électronique (conditionnelle) -->
+        <ion-item *ngIf="showWalletOption" [disabled]="!canUseWallet">
+          <ion-label>
+            <div class="payment-method">
+              <ion-icon name="wallet-outline" [color]="canUseWallet ? 'warning' : 'medium'"></ion-icon>
+              <div class="method-details">
+                <h3>Portefeuille électronique</h3>
+                <p *ngIf="canUseWallet">Payer avec votre solde de portefeuille</p>
+                <p *ngIf="!canUseWallet" class="error-text">
+                  Solde insuffisant 
+                  <ion-button size="small" fill="clear" routerLink="/wallet">
+                    Recharger
+                    <ion-icon name="add-circle-outline" slot="end"></ion-icon>
+                  </ion-button>
+                </p>
+                <p *ngIf="(wallet$ | async) as wallet">
+                  Solde disponible: {{ wallet.balance | currency:'DZD':'symbol':'1.0-0' }}
+                </p>
+              </div>
+            </div>
+          </ion-label>
+          <ion-radio slot="start" value="wallet" (click)="selectMethod('wallet')" [disabled]="!canUseWallet"></ion-radio>
+        </ion-item>
+      </ion-radio-group>
+    </ion-list>
+
+    <ion-spinner *ngIf="isLoading" name="crescent" class="spinner-center"></ion-spinner>
+  </ion-card-content>
+</ion-card>

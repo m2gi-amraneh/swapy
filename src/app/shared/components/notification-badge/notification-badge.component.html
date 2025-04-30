@@ -1,0 +1,4 @@
+<ion-button routerLink="/notifications" class="notification-button">
+  <ion-icon name="notifications-outline"></ion-icon>
+  <ion-badge *ngIf="unreadCount > 0" color="danger">{{ unreadCount > 99 ? '99+' : unreadCount }}</ion-badge>
+</ion-button>

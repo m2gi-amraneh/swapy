@@ -1,0 +1,47 @@
+<div class="services-container">
+  <div class="header-actions">
+    <h2>Mes services</h2>
+    <ion-button (click)="onAddService()" color="primary">
+      <ion-icon name="add-outline" slot="start"></ion-icon>
+      Ajouter un service
+    </ion-button>
+  </div>
+
+  <ng-container *ngIf="!isLoading; else loading">
+    <ng-container *ngIf="services$ | async as services">
+      <div *ngIf="services.length > 0; else noServices" class="services-grid">
+        <ion-card *ngFor="let service of services" class="service-item">
+          <app-service-card [service]="service"></app-service-card>
+          
+          <div class="service-actions">
+            <ion-button fill="clear" (click)="onEditService(service.id)">
+              <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+            <ion-button fill="clear" color="danger" (click)="onDeleteService(service.id)">
+              <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
+        </ion-card>
+      </div>
+      
+      <ng-template #noServices>
+        <div class="no-services">
+          <ion-icon name="briefcase-outline" size="large"></ion-icon>
+          <h3>Aucun service</h3>
+          <p>Vous n'avez pas encore ajouté de services. Commencez par en créer un !</p>
+          <ion-button (click)="onAddService()" expand="block">
+            <ion-icon name="add-outline" slot="start"></ion-icon>
+            Ajouter un service
+          </ion-button>
+        </div>
+      </ng-template>
+    </ng-container>
+  </ng-container>
+  
+  <ng-template #loading>
+    <div class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Chargement des services...</p>
+    </div>
+  </ng-template>
+</div>

@@ -1,0 +1,88 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/chat"></ion-back-button>
+    </ion-buttons>
+    <ion-title *ngIf="otherUser$ | async as otherUser">
+      {{ otherUser?.displayName || 'Conversation' }}
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="isLoading" class="ion-padding ion-text-center">
+    <ion-spinner></ion-spinner>
+    <p>Chargement des messages...</p>
+  </div>
+
+  <div class="message-container" *ngIf="!isLoading">
+    <ng-container *ngIf="(messages$ | async) as messages">
+      <div *ngIf="messages.length === 0" class="ion-padding ion-text-center empty-state">
+        <ion-icon name="chatbubble-outline" size="large"></ion-icon>
+        <h2>Aucun message</h2>
+        <p>Commencez la conversation en envoyant un message.</p>
+      </div>
+
+      <ng-container *ngFor="let message of messages; let i = index">
+        <!-- Date separator -->
+        <div *ngIf="shouldShowDate(message, i, messages)" class="date-separator">
+          <span>{{ getMessageDate(message.timestamp) }}</span>
+        </div>
+
+        <!-- Message -->
+        <div class="message-wrapper" [ngClass]="{'own-message': message.senderId === currentUserId, 'consecutive': isConsecutiveMessage(message, i, messages)}">
+          <div class="message" [ngClass]="{'own': message.senderId === currentUserId}">
+            <div class="message-content">
+              <div [ngSwitch]="message.type">
+                <!-- Text message -->
+                <div *ngSwitchCase="'text'" [innerHTML]="message.content | linky"></div>
+                
+                <!-- Image message -->
+                <div *ngSwitchCase="'image'" class="image-message">
+                  <img [src]="message.metadata?.imageUrl" alt="Image" (click)="openImage(message.metadata?.imageUrl)">
+                </div>
+                
+                <!-- File message -->
+                <div *ngSwitchCase="'file'" class="file-message">
+                  <ion-icon name="document-outline"></ion-icon>
+                  <div class="file-info">
+                    <div class="file-name">{{ message.metadata?.fileName }}</div>
+                    <div class="file-size" *ngIf="message.metadata?.fileSize">
+                      {{ (message.metadata?.fileSize / 1024).toFixed(1) }} KB
+                    </div>
+                  </div>
+                  <ion-button fill="clear" size="small" (click)="downloadFile(message.metadata?.fileUrl, message.metadata?.fileName)">
+                    <ion-icon name="download-outline"></ion-icon>
+                  </ion-button>
+                </div>
+              </div>
+            </div>
+            <div class="message-time">{{ getMessageTime(message.timestamp) }}</div>
+          </div>
+        </div>
+      </ng-container>
+    </ng-container>
+  </div>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <div class="message-input-container">
+      <ion-button fill="clear" size="small" (click)="openAttachmentOptions()">
+        <ion-icon name="attach-outline"></ion-icon>
+      </ion-button>
+      
+      <ion-input 
+        #messageInput
+        placeholder="Écrivez votre message..." 
+        [(ngModel)]="newMessage" 
+        (keyup.enter)="sendMessage()"
+        class="message-input">
+      </ion-input>
+      
+      <ion-button fill="clear" size="small" [disabled]="!newMessage.trim()" (click)="sendMessage()">
+        <ion-icon name="send"></ion-icon>
+      </ion-button>
+    </div>
+  </ion-toolbar>
+</ion-footer>
