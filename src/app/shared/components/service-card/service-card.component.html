@@ -1,0 +1,57 @@
+<ion-card [routerLink]="['/services', service.id]" class="service-card">
+  <ion-img [src]="getFirstPhoto()" class="service-image"></ion-img>
+
+  <ion-card-header>
+    <ion-item lines="none">
+      <ion-avatar slot="start">
+        <img
+          [src]="
+            providerPhoto ||
+            'https://ionicframework.com/docs/img/demos/avatar.svg'
+          "
+          alt="Provider photo"
+        />
+      </ion-avatar>
+      <ion-label>
+        <h3>{{ service.name }}</h3>
+        <p>{{ providerName }}</p>
+      </ion-label>
+      <ion-chip [color]="getStatusColor()" slot="end">
+        {{ service.status }}
+      </ion-chip>
+    </ion-item>
+  </ion-card-header>
+
+  <ion-card-content>
+    <p class="description">{{ service.description }}</p>
+
+    <div class="service-info">
+      <ion-item lines="none">
+        <ion-icon name="location" slot="start"></ion-icon>
+        <ion-label>{{ service.location || "Non spécifié" }}</ion-label>
+      </ion-item>
+
+      <ion-item lines="none">
+        <ion-icon name="star" slot="start"></ion-icon>
+        <ion-label>
+          {{ getAverageRating() | number : "1.1-1" }}
+          ({{ service.ratings?.length || 0 }} avis)
+        </ion-label>
+      </ion-item>
+
+      <ion-item lines="none">
+        <ion-icon name="eye" slot="start"></ion-icon>
+        <ion-label>{{ service.views || 0 }} vues</ion-label>
+      </ion-item>
+    </div>
+
+    <div class="price-section">
+      <ion-text color="primary" class="price">
+        {{ service.price | currency : "DZD" : "symbol" : "1.0-0" }}
+      </ion-text>
+      <ion-button fill="solid" color="primary" (click)="onBookNow($event)">
+        Réserver
+      </ion-button>
+    </div>
+  </ion-card-content>
+</ion-card>

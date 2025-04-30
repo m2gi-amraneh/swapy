@@ -1,0 +1,55 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Conversations</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="ngOnInit(); $event.target.complete()">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div *ngIf="isLoading" class="ion-padding ion-text-center">
+    <ion-spinner></ion-spinner>
+    <p>Chargement des conversations...</p>
+  </div>
+
+  <ion-list *ngIf="!isLoading">
+    <ng-container *ngIf="(conversations$ | async)?.length; else noConversations">
+      <ion-item *ngFor="let conversation of conversations$ | async" 
+                [routerLink]="['/chat', conversation.id]" 
+                detail="true"
+                class="conversation-item">
+        <ion-avatar slot="start">
+          <img [src]="conversation.otherUser?.photoURL || 'assets/default-avatar.png'" alt="Avatar">
+        </ion-avatar>
+        <ion-label>
+          <div class="conversation-header">
+            <h2>{{ conversation.otherUser?.displayName || 'Utilisateur' }}</h2>
+            <ion-note *ngIf="conversation.lastMessage">
+              {{ getLastMessageTime(conversation.lastMessage.timestamp) }}
+            </ion-note>
+          </div>
+          <p *ngIf="conversation.lastMessage" class="last-message">
+            <span *ngIf="conversation.lastMessage.senderId === currentUserId">Vous: </span>
+            {{ getLastMessagePreview(conversation.lastMessage.content) }}
+          </p>
+        </ion-label>
+        <ion-badge *ngIf="conversation.unreadCount > 0" slot="end" color="primary">
+          {{ conversation.unreadCount }}
+        </ion-badge>
+        <ion-button fill="clear" slot="end" (click)="deleteConversation(conversation.id, $event)">
+          <ion-icon name="trash-outline" color="danger"></ion-icon>
+        </ion-button>
+      </ion-item>
+    </ng-container>
+
+    <ng-template #noConversations>
+      <div class="ion-padding ion-text-center empty-state">
+        <ion-icon name="chatbubble-outline" size="large"></ion-icon>
+        <h2>Aucune conversation</h2>
+        <p>Vous n'avez pas encore de conversations. Commencez à discuter avec un prestataire ou un client.</p>
+      </div>
+    </ng-template>
+  </ion-list>
+</ion-content>

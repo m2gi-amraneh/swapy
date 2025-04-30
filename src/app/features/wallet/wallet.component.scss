@@ -1,0 +1,437 @@
+:host {
+  display: block;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  
+  ion-spinner {
+    margin-bottom: 16px;
+  }
+}
+
+// Styles pour la section Solde
+.balance-container {
+  padding: 16px 0;
+  
+  .balance-card {
+    background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-primary-shade));
+    border-radius: 16px;
+    padding: 24px;
+    color: white;
+    box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.3);
+    margin-bottom: 24px;
+    
+    .balance-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 16px;
+      
+      ion-icon {
+        font-size: 24px;
+        margin-right: 12px;
+      }
+      
+      h2 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 500;
+      }
+    }
+    
+    .balance-amount {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    
+    .balance-updated {
+      font-size: 12px;
+      opacity: 0.8;
+      text-align: right;
+    }
+  }
+  
+  .balance-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  
+  .recent-transactions {
+    h3 {
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 16px;
+      color: var(--ion-color-dark);
+    }
+    
+    ion-item {
+      --padding-start: 0;
+
+      h4 {
+        font-size: 14px;
+        font-weight: 500;
+        margin: 0 0 4px;
+      }
+
+      p {
+        font-size: 12px;
+        color: var(--ion-color-medium);
+        margin: 0;
+      }
+
+      ion-note {
+        font-size: 14px;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+// Styles pour les formulaires
+.form-container {
+  padding: 16px 0;
+  
+  h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: var(--ion-color-dark);
+  }
+  
+  ion-note {
+    color: var(--ion-color-danger);
+    display: block;
+    margin: 4px 0 16px 16px;
+    font-size: 12px;
+  }
+  
+  .payment-methods {
+    margin: 24px 0;
+    
+    h4 {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 16px;
+      color: var(--ion-color-dark);
+    }
+    
+    .payment-method {
+      display: flex;
+      align-items: center;
+      
+      ion-icon {
+        margin-right: 12px;
+        font-size: 20px;
+      }
+    }
+  }
+  
+  ion-button {
+    margin-top: 24px;
+  }
+  
+  .available-balance {
+    background-color: var(--ion-color-light);
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    .amount {
+      font-weight: 700;
+      color: var(--ion-color-primary);
+      font-size: 18px;
+    }
+  }
+}
+
+// Styles pour les messages
+.success-message, .error-message {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  
+  ion-icon {
+    font-size: 24px;
+    margin-right: 12px;
+  }
+}
+
+.success-message {
+  background-color: rgba(var(--ion-color-success-rgb), 0.1);
+  color: var(--ion-color-success);
+}
+
+.error-message {
+  background-color: rgba(var(--ion-color-danger-rgb), 0.1);
+  color: var(--ion-color-danger);
+}
+
+// Styles pour l'historique
+.history-container {
+  padding: 16px 0;
+  
+  h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: var(--ion-color-dark);
+  }
+  
+  .filter-section {
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    
+    ion-button {
+      align-self: flex-end;
+    }
+  }
+  
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 0;
+    color: var(--ion-color-medium);
+    
+    ion-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+  }
+  
+  ion-item {
+    --padding-start: 0;
+
+    h4 {
+      font-size: 14px;
+      font-weight: 500;
+      margin: 0 0 4px;
+    }
+
+    p {
+      font-size: 12px;
+      color: var(--ion-color-medium);
+      margin: 0;
+
+      &.status {
+        margin-top: 4px;
+        color: var(--ion-color-warning);
+      }
+    }
+
+    ion-note {
+      font-size: 14px;
+      font-weight: 600;
+    }
+  }
+}
+
+// Styles pour les états vides
+.no-wallet, .no-transactions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 0;
+  color: var(--ion-color-medium);
+  
+  ion-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+  
+  h2, h3 {
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  
+  p {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+}
+
+// Styles pour les statistiques
+.stats-container {
+  padding: 16px 0;
+  
+  h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: var(--ion-color-dark);
+  }
+  
+  h3 {
+    font-size: 18px;
+    font-weight: 500;
+    margin: 24px 0 16px;
+    color: var(--ion-color-dark);
+  }
+  
+  .stats-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+    
+    ion-card {
+      margin: 0;
+      
+      ion-card-header {
+        padding: 16px;
+      }
+      
+      ion-card-title {
+        font-size: 18px;
+      }
+    }
+  }
+  
+  .chart-container {
+    background-color: white;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    
+    .chart-placeholder {
+      min-height: 200px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      
+      .chart-bars {
+        display: flex;
+        align-items: flex-end;
+        width: 100%;
+        height: 200px;
+        gap: 8px;
+        
+        .chart-bar {
+          flex: 1;
+          min-width: 30px;
+          background-color: var(--ion-color-primary);
+          border-radius: 4px 4px 0 0;
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-end;
+          align-items: center;
+          
+          &.positive {
+            background-color: var(--ion-color-success);
+          }
+          
+          &.negative {
+            background-color: var(--ion-color-danger);
+          }
+          
+          .bar-value {
+            font-size: 10px;
+            color: white;
+            padding: 4px;
+            text-align: center;
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+          
+          .bar-label {
+            position: absolute;
+            bottom: -24px;
+            font-size: 10px;
+            transform: rotate(-45deg);
+            transform-origin: top left;
+            width: 70px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+          }
+        }
+      }
+      
+      .pie-chart {
+        display: flex;
+        height: 150px;
+        width: 150px;
+        border-radius: 50%;
+        overflow: hidden;
+        margin: 0 auto;
+        
+        .pie-segment {
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-size: 10px;
+          text-align: center;
+          overflow: hidden;
+        }
+      }
+      
+      .pie-legend {
+        margin-top: 32px;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        
+        .legend-item {
+          display: flex;
+          align-items: center;
+          
+          .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            margin-right: 8px;
+          }
+          
+          .legend-label {
+            margin-right: 8px;
+            font-weight: 500;
+          }
+          
+          .legend-value {
+            margin-left: auto;
+            font-size: 12px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 576px) {
+  .stats-container {
+    .stats-cards {
+      grid-template-columns: 1fr;
+    }
+    
+    .pie-legend {
+      grid-template-columns: 1fr !important;
+    }
+  }
+  
+  .balance-actions {
+    grid-template-columns: 1fr !important;
+  }
+}

@@ -1,0 +1,69 @@
+<!-- src/app/shared/components/main-tabs/main-tabs.component.html -->
+
+<ion-router-outlet></ion-router-outlet>
+
+<ion-tabs>
+  <!-- This outlet will display the content of the active tab -->
+
+  <ion-tab-bar slot="bottom">
+    <!-- Use 'tab' attribute matching the child route path -->
+    <ion-tab-button tab="home">
+      <ion-icon name="home-outline"></ion-icon>
+      <ion-label>Accueil</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="services">
+      <ion-icon name="briefcase-outline"></ion-icon>
+      <ion-label>Services</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="chat" *ngIf="isLoggedIn">
+      <ion-icon name="chatbubbles-outline"></ion-icon>
+      <ion-label>Messages</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="bookings" *ngIf="isLoggedIn">
+      <ion-icon name="calendar-outline"></ion-icon>
+      <ion-label>Réservations</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="profile" *ngIf="isLoggedIn">
+      <ion-icon name="person-outline"></ion-icon>
+      <ion-label>Profil</ion-label>
+    </ion-tab-button>
+
+    <!-- Consider how login should work. Maybe it navigates *away* from tabs? -->
+    <!-- Option 1: Keep as tab linking to a login page within tabs structure -->
+    <ion-tab-button tab="auth" *ngIf="!isLoggedIn">
+      <ion-icon name="log-in-outline"></ion-icon>
+      <ion-label>Connexion</ion-label>
+    </ion-tab-button>
+    <!-- Option 2: Make it a regular button navigating outside tabs -->
+    <!--
+    <ion-tab-button *ngIf="!isLoggedIn" (click)="goToLogin()">
+       <ion-icon name="log-in-outline"></ion-icon>
+       <ion-label>Connexion</ion-label>
+    </ion-tab-button>
+    -->
+  </ion-tab-bar>
+
+  <!-- RELOCATE THESE: -->
+  <!-- Floating FAB (place outside ion-tabs in the parent component or use slot="fixed" correctly) -->
+  <!--
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="isLoggedIn && isProvider">
+    <ion-fab-button routerLink="/services/create"> // Ensure this route exists independently
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+  -->
+
+  <!-- Notification/Wallet Buttons (place in header of pages or handle differently) -->
+  <!--
+  <div class="floating-buttons" *ngIf="isLoggedIn">
+    <app-notification-badge></app-notification-badge> // This component needs routing itself
+    <ion-button routerLink="/wallet" class="wallet-button"> // Ensure /wallet route exists independently
+      <ion-icon name="wallet-outline"></ion-icon>
+    </ion-button>
+  </div>
+  -->
+</ion-tabs>

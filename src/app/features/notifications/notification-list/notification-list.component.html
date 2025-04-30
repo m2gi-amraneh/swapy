@@ -1,0 +1,79 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Notifications</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="markAllAsRead()" *ngIf="unreadCount > 0">
+        <ion-icon slot="icon-only" name="checkmark-done-outline"></ion-icon>
+      </ion-button>
+      <ion-button (click)="clearAll()">
+        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ng-container *ngIf="notifications$ | async as notifications; else loading">
+    <div *ngIf="notifications.length > 0; else noNotifications">
+      <ion-list>
+        <ion-item-sliding *ngFor="let notification of notifications">
+          <ion-item 
+            [routerLink]="getNotificationRoute(notification)"
+            (click)="markAsRead(notification)"
+            [class.unread]="!notification.read">
+            <ion-avatar slot="start">
+              <div class="notification-icon-wrapper" [ngClass]="getNotificationColor(notification.type)">
+                <ion-icon [name]="getNotificationIcon(notification.type)"></ion-icon>
+              </div>
+            </ion-avatar>
+            
+            <ion-label>
+              <h2>{{ notification.title }}</h2>
+              <p>{{ notification.message }}</p>
+              <p class="timestamp">{{ getRelativeTime(notification.createdAt) }}</p>
+            </ion-label>
+            
+            <ion-icon *ngIf="!notification.read" name="ellipse" color="primary" class="unread-indicator"></ion-icon>
+          </ion-item>
+          
+          <ion-item-options side="end">
+            <ion-item-option color="danger" (click)="deleteNotification(notification, $event)">
+              <ion-icon slot="icon-only" name="trash"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
+      </ion-list>
+    </div>
+  </ng-container>
+  
+  <ng-template #noNotifications>
+    <div class="empty-state">
+      <ion-icon name="notifications-outline"></ion-icon>
+      <h2>Aucune notification</h2>
+      <p>Vous n'avez pas de notifications pour le moment.</p>
+    </div>
+  </ng-template>
+  
+  <ng-template #loading>
+    <div class="loading-container">
+      <ion-list>
+        <ion-item *ngFor="let i of [1,2,3,4,5]">
+          <ion-avatar slot="start">
+            <ion-skeleton-text animated></ion-skeleton-text>
+          </ion-avatar>
+          <ion-label>
+            <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </div>
+  </ng-template>
+</ion-content>

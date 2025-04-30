@@ -1,0 +1,42 @@
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+  <ion-list>
+    <ion-item>
+      <ion-label position="floating">Email</ion-label>
+      <ion-input type="email" formControlName="email"></ion-input>
+    </ion-item>
+    <div class="error-message" *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid">
+      <ion-text color="danger" *ngIf="loginForm.get('email')?.errors?.['required']">
+        L'email est requis
+      </ion-text>
+      <ion-text color="danger" *ngIf="loginForm.get('email')?.errors?.['email']">
+        Format d'email invalide
+      </ion-text>
+    </div>
+
+    <ion-item>
+      <ion-label position="floating">Mot de passe</ion-label>
+      <ion-input type="password" formControlName="password"></ion-input>
+    </ion-item>
+    <div class="error-message" *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid">
+      <ion-text color="danger" *ngIf="loginForm.get('password')?.errors?.['required']">
+        Le mot de passe est requis
+      </ion-text>
+      <ion-text color="danger" *ngIf="loginForm.get('password')?.errors?.['minlength']">
+        Le mot de passe doit contenir au moins 6 caractères
+      </ion-text>
+    </div>
+  </ion-list>
+
+  <div class="error-message" *ngIf="errorMessage">
+    <ion-text color="danger">{{ errorMessage }}</ion-text>
+  </div>
+
+  <ion-button expand="block" type="submit" [disabled]="loginForm.invalid || isLoading">
+    <ion-spinner name="crescent" *ngIf="isLoading"></ion-spinner>
+    <span *ngIf="!isLoading">Se connecter</span>
+  </ion-button>
+
+
+
+
+</form>

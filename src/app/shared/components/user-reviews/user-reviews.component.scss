@@ -1,0 +1,127 @@
+.review-item {
+  margin-bottom: 16px;
+  border-radius: var(--ion-border-radius);
+  --background: var(--ion-color-light-tint);
+  
+  .review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    
+    .rating {
+      display: flex;
+      
+      ion-icon {
+        font-size: 18px;
+        margin-right: 2px;
+      }
+    }
+    
+    .date {
+      font-size: 12px;
+    }
+  }
+  
+  .review-comment {
+    margin: 8px 0;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  .review-actions {
+    margin-top: 8px;
+    
+    ion-button {
+      --padding-start: 4px;
+      --padding-end: 8px;
+      font-size: 12px;
+      
+      ion-icon {
+        font-size: 16px;
+        margin-right: 4px;
+      }
+    }
+  }
+  
+  .provider-response {
+    margin-top: 12px;
+    
+    .response-item {
+      --background: var(--ion-color-light);
+      border-left: 3px solid var(--ion-color-primary);
+      margin-left: 16px;
+      
+      h3 {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--ion-color-primary);
+        margin-bottom: 4px;
+      }
+      
+      p {
+        font-size: 13px;
+        margin: 4px 0;
+      }
+      
+      .response-date {
+        font-size: 11px;
+        display: block;
+        margin-top: 4px;
+      }
+    }
+  }
+}
+
+.empty-reviews {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  color: var(--ion-color-medium);
+  
+  ion-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+  
+  p {
+    font-size: 16px;
+    text-align: center;
+  }
+}
+
+.add-review-form {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--ion-color-light);
+  
+  ion-item-divider {
+    --background: transparent;
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    margin-bottom: 16px;
+    
+    ion-label {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--ion-color-dark);
+    }
+  }
+  
+  .rating-input {
+    display: flex;
+    padding: 8px 0;
+    
+    ion-icon {
+      font-size: 28px;
+      margin-right: 8px;
+      cursor: pointer;
+    }
+  }
+  
+  ion-button {
+    margin-top: 16px;
+  }
+}

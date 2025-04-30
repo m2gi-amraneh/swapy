@@ -1,0 +1,331 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Mon Portefeuille</ion-title>
+  </ion-toolbar>
+  
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="activeSegment" (ionChange)="segmentChanged($event)" mode="ios">
+      <ion-segment-button value="balance">
+        <ion-label>Solde</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="deposit">
+        <ion-label>Dépôt</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="withdraw">
+        <ion-label>Retrait</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="history">
+        <ion-label>Historique</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="stats">
+        <ion-label>Statistiques</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="loading-container" *ngIf="isLoading">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Chargement de votre portefeuille...</p>
+  </div>
+
+  <div class="error-message" *ngIf="errorMessage">
+    <ion-icon name="alert-circle-outline"></ion-icon>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <div class="success-message" *ngIf="successMessage">
+    <ion-icon name="checkmark-circle-outline"></ion-icon>
+    <span>{{ successMessage }}</span>
+  </div>
+
+  <ng-container>
+    <div class="no-wallet" *ngIf="(wallet$ | async) === null">
+      <ion-icon name="wallet-outline"></ion-icon>
+      <h2>Aucun portefeuille trouvé</h2>
+      <p>Vous n'avez pas encore de portefeuille. Nous allons en créer un pour vous.</p>
+      <ion-button (click)="createWallet()">Créer mon portefeuille</ion-button>
+    </div>
+
+    <ng-container *ngIf="wallet$ | async as wallet">
+      <div class="balance-container" *ngIf="activeSegment === 'balance'">
+        <div class="balance-card">
+          <div class="balance-header">
+            <ion-icon name="wallet-outline"></ion-icon>
+            <h2>Solde disponible</h2>
+          </div>
+          <div class="balance-amount">{{ wallet.balance | currency:'DZD':'symbol':'1.0-0' }}</div>
+          <div class="balance-updated">Dernière mise à jour: {{ wallet.updatedAt | date:'medium' }}</div>
+        </div>
+
+        <div class="balance-actions">
+          <ion-button expand="block" (click)="activeSegment = 'deposit'">
+            <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+            Dépôt
+          </ion-button>
+          <ion-button expand="block" (click)="activeSegment = 'withdraw'" [disabled]="wallet.balance <= 0">
+            <ion-icon name="arrow-down-circle-outline" slot="start"></ion-icon>
+            Retrait
+          </ion-button>
+        </div>
+
+        <div class="recent-transactions">
+          <h3>Transactions récentes</h3>
+          <ion-list *ngIf="(transactions$ | async)?.length; else noTransactions">
+            <ion-item *ngFor="let transaction of (transactions$ | async)?.slice(0, 5)">
+              <ion-icon [name]="getTransactionIcon(transaction.type)" slot="start" [color]="getTransactionColor(transaction)"></ion-icon>
+              <ion-label>
+                <h2>{{ getTransactionLabel(transaction.type) }}</h2>
+                <p>{{ transaction.createdAt | date:'medium' }}</p>
+              </ion-label>
+              <ion-note [color]="getTransactionColor(transaction)" slot="end">
+                {{ transaction.amount | currency:'DZD':'symbol':'1.0-0' }}
+              </ion-note>
+            </ion-item>
+            <ion-item lines="none" detail="true" (click)="activeSegment = 'history'">
+              <ion-label color="primary">Voir tout l'historique</ion-label>
+            </ion-item>
+          </ion-list>
+          <ng-template #noTransactions>
+            <div class="no-transactions">
+              <ion-icon name="document-text-outline"></ion-icon>
+              <h3>Aucune transaction</h3>
+              <p>Vous n'avez pas encore effectué de transaction.</p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
+      <div class="form-container" *ngIf="activeSegment === 'deposit'">
+        <h2>Dépôt d'argent</h2>
+        <div class="available-balance">
+          <span>Solde actuel:</span>
+          <span class="amount">{{ wallet.balance | currency:'DZD':'symbol':'1.0-0' }}</span>
+        </div>
+        <form [formGroup]="depositForm" (ngSubmit)="onDepositSubmit()">
+          <ion-item>
+            <ion-label position="floating">Montant (DZD)</ion-label>
+            <ion-input type="number" formControlName="amount"></ion-input>
+          </ion-item>
+          <ion-note *ngIf="depositForm.get('amount')?.hasError('required') && depositForm.get('amount')?.touched">
+            Le montant est requis
+          </ion-note>
+          <ion-note *ngIf="depositForm.get('amount')?.hasError('min') && depositForm.get('amount')?.touched">
+            Le montant minimum est de 100 DZD
+          </ion-note>
+          <ion-note *ngIf="depositForm.get('amount')?.hasError('max') && depositForm.get('amount')?.touched">
+            Le montant maximum est de 100 000 DZD
+          </ion-note>
+
+          <div class="payment-methods">
+            <h4>Méthode de paiement</h4>
+            <ion-radio-group value="card">
+              <ion-item>
+                <ion-radio value="card" slot="start"></ion-radio>
+                <div class="payment-method">
+                  <ion-icon name="card-outline"></ion-icon>
+                  <ion-label>Carte bancaire</ion-label>
+                </div>
+              </ion-item>
+              <ion-item>
+                <ion-radio value="edahabia" slot="start"></ion-radio>
+                <div class="payment-method">
+                  <ion-icon name="card-outline"></ion-icon>
+                  <ion-label>Carte Edahabia</ion-label>
+                </div>
+              </ion-item>
+              <ion-item>
+                <ion-radio value="cib" slot="start"></ion-radio>
+                <div class="payment-method">
+                  <ion-icon name="card-outline"></ion-icon>
+                  <ion-label>Carte CIB</ion-label>
+                </div>
+              </ion-item>
+            </ion-radio-group>
+          </div>
+
+          <ion-button type="submit" expand="block" [disabled]="depositForm.invalid || isProcessing">
+            <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+            Déposer
+          </ion-button>
+        </form>
+      </div>
+
+      <div class="form-container" *ngIf="activeSegment === 'withdraw'">
+        <h2>Retrait d'argent</h2>
+        <div class="available-balance">
+          <span>Solde disponible:</span>
+          <span class="amount">{{ wallet.balance | currency:'DZD':'symbol':'1.0-0' }}</span>
+        </div>
+        <form [formGroup]="withdrawForm" (ngSubmit)="onWithdrawSubmit()">
+          <ion-item>
+            <ion-label position="floating">Montant (DZD)</ion-label>
+            <ion-input type="number" formControlName="amount"></ion-input>
+          </ion-item>
+          <ion-note *ngIf="withdrawForm.get('amount')?.hasError('required') && withdrawForm.get('amount')?.touched">
+            Le montant est requis
+          </ion-note>
+          <ion-note *ngIf="withdrawForm.get('amount')?.hasError('min') && withdrawForm.get('amount')?.touched">
+            Le montant minimum est de 100 DZD
+          </ion-note>
+          <ion-note *ngIf="withdrawForm.get('amount')?.hasError('max') && withdrawForm.get('amount')?.touched">
+            Le montant maximum est de 100 000 DZD
+          </ion-note>
+
+          <ion-item>
+            <ion-label position="floating">Numéro de compte bancaire</ion-label>
+            <ion-input type="text" formControlName="bankAccount"></ion-input>
+          </ion-item>
+          <ion-note *ngIf="withdrawForm.get('bankAccount')?.hasError('required') && withdrawForm.get('bankAccount')?.touched">
+            Le numéro de compte est requis
+          </ion-note>
+
+          <ion-button type="submit" expand="block" [disabled]="withdrawForm.invalid || isProcessing || wallet.balance <= 0">
+            <ion-icon name="arrow-down-circle-outline" slot="start"></ion-icon>
+            Retirer
+          </ion-button>
+        </form>
+      </div>
+
+      <div class="history-container" *ngIf="activeSegment === 'history'">
+        <h2>Historique des transactions</h2>
+        
+        <div class="filter-section">
+          <ion-item>
+            <ion-label>Type de transaction</ion-label>
+            <ion-select (ionChange)="filterTransactionsByType($event.detail.value)" interface="popover">
+              <ion-select-option [value]="null">Tous</ion-select-option>
+              <ion-select-option value="deposit">Dépôts</ion-select-option>
+              <ion-select-option value="withdrawal">Retraits</ion-select-option>
+              <ion-select-option value="payment">Paiements</ion-select-option>
+              <ion-select-option value="refund">Remboursements</ion-select-option>
+            </ion-select>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label>Période</ion-label>
+            <ion-select interface="popover" (ionChange)="onDateRangeChange($event.detail.value)">
+              <ion-select-option [value]="null">Toutes les dates</ion-select-option>
+              <ion-select-option value="7days">7 derniers jours</ion-select-option>
+              <ion-select-option value="30days">30 derniers jours</ion-select-option>
+              <ion-select-option value="3months">3 derniers mois</ion-select-option>
+              <ion-select-option value="6months">6 derniers mois</ion-select-option>
+              <ion-select-option value="1year">1 an</ion-select-option>
+            </ion-select>
+          </ion-item>
+          
+          <ion-button fill="clear" (click)="clearFilters()">
+            <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+            Effacer les filtres
+          </ion-button>
+        </div>
+        
+        <ion-list *ngIf="(filteredTransactions$ | async)?.length; else noFilteredTransactions">
+          <ion-item *ngFor="let transaction of (filteredTransactions$ | async)">
+            <ion-icon [name]="getTransactionIcon(transaction.type)" slot="start" [color]="getTransactionColor(transaction)"></ion-icon>
+            <ion-label>
+              <h2>{{ getTransactionLabel(transaction.type) }}</h2>
+              <p>{{ transaction.createdAt | date:'medium' }}</p>
+              <p *ngIf="transaction.description">{{ transaction.description }}</p>
+            </ion-label>
+            <ion-note [color]="getTransactionColor(transaction)" slot="end">
+              {{ transaction.amount | currency:'DZD':'symbol':'1.0-0' }}
+            </ion-note>
+          </ion-item>
+        </ion-list>
+        
+        <ng-template #noFilteredTransactions>
+          <div class="empty-state">
+            <ion-icon name="search-outline"></ion-icon>
+            <h3>Aucune transaction trouvée</h3>
+            <p>Aucune transaction ne correspond à vos critères de recherche.</p>
+            <ion-button fill="clear" (click)="clearFilters()">
+              Effacer les filtres
+            </ion-button>
+          </div>
+        </ng-template>
+      </div>
+      
+      <div class="stats-container" *ngIf="activeSegment === 'stats'">
+        <h2>Statistiques du portefeuille</h2>
+        
+        <div class="stats-cards" *ngIf="transactionSummary$ | async as summary">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-subtitle>Total des dépôts</ion-card-subtitle>
+              <ion-card-title color="success">{{ summary.totalDeposits | currency:'DZD':'symbol':'1.0-0' }}</ion-card-title>
+            </ion-card-header>
+          </ion-card>
+          
+          <ion-card>
+            <ion-card-header>
+              <ion-card-subtitle>Total des retraits</ion-card-subtitle>
+              <ion-card-title color="danger">{{ summary.totalWithdrawals | currency:'DZD':'symbol':'1.0-0' }}</ion-card-title>
+            </ion-card-header>
+          </ion-card>
+          
+          <ion-card>
+            <ion-card-header>
+              <ion-card-subtitle>Total des paiements</ion-card-subtitle>
+              <ion-card-title color="danger">{{ summary.totalPayments | currency:'DZD':'symbol':'1.0-0' }}</ion-card-title>
+            </ion-card-header>
+          </ion-card>
+          
+          <ion-card>
+            <ion-card-header>
+              <ion-card-subtitle>Total des remboursements</ion-card-subtitle>
+              <ion-card-title color="success">{{ summary.totalRefunds | currency:'DZD':'symbol':'1.0-0' }}</ion-card-title>
+            </ion-card-header>
+          </ion-card>
+        </div>
+        
+        <h3>Évolution du solde par mois</h3>
+        <div class="chart-container">
+          <div class="chart-placeholder" *ngIf="transactionsByMonth.length > 0">
+            <div class="chart-bars">
+              <div class="chart-bar" *ngFor="let item of transactionsByMonth" 
+                   [ngClass]="{'positive': item.amount >= 0, 'negative': item.amount < 0}"
+                   [style.height.%]="getBarHeight(item.amount)">
+                <div class="bar-value">{{ item.amount | currency:'DZD':'symbol':'1.0-0' }}</div>
+                <div class="bar-label">{{ item.month }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="empty-state" *ngIf="transactionsByMonth.length === 0">
+            <ion-icon name="bar-chart-outline"></ion-icon>
+            <p>Pas assez de données pour afficher le graphique</p>
+          </div>
+        </div>
+        
+        <h3>Répartition par type de transaction</h3>
+        <div class="chart-container">
+          <div class="chart-placeholder" *ngIf="transactionsByType.length > 0">
+            <div class="pie-chart">
+              <div class="pie-segment" *ngFor="let item of transactionsByType; let i = index" 
+                   [style.background-color]="getPieSegmentColor(item.type)"
+                   [style.width.%]="getPieSegmentSize(item.amount)">
+                {{ item.type }}
+              </div>
+            </div>
+            
+            <div class="pie-legend">
+              <div class="legend-item" *ngFor="let item of transactionsByType">
+                <div class="legend-color" [style.background-color]="getPieSegmentColor(item.type)"></div>
+                <div class="legend-label">{{ getTransactionLabel(item.type) }}</div>
+                <div class="legend-value">{{ item.amount | currency:'DZD':'symbol':'1.0-0' }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="empty-state" *ngIf="transactionsByType.length === 0">
+            <ion-icon name="pie-chart-outline"></ion-icon>
+            <p>Pas assez de données pour afficher le graphique</p>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
+</ion-content>

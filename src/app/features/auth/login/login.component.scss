@@ -1,0 +1,93 @@
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  background: var(--ion-color-light);
+  border-radius: 8px;
+
+  ion-list {
+    background: transparent;
+    padding: 0;
+
+    ion-item {
+      --background: var(--ion-color-light);
+      --border-color: var(--ion-color-medium);
+      --border-radius: 8px;
+      --padding-start: 16px;
+      --padding-end: 16px;
+      margin-bottom: 8px;
+
+      &.ion-invalid.ion-touched {
+        --border-color: var(--ion-color-danger);
+      }
+
+      ion-label {
+        color: var(--ion-color-medium);
+      }
+
+      ion-input {
+        --padding-start: 8px;
+        --padding-end: 8px;
+      }
+    }
+  }
+
+  .error-message {
+    padding: 0 16px;
+    margin-bottom: 8px;
+    font-size: 12px;
+  }
+
+  ion-button {
+    margin: 16px 0;
+    height: 48px;
+    --border-radius: 8px;
+
+    ion-spinner {
+      margin-right: 8px;
+    }
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 16px 0;
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid var(--ion-color-medium);
+    }
+
+    span {
+      padding: 0 16px;
+      color: var(--ion-color-medium);
+      font-size: 14px;
+    }
+  }
+
+  .forgot-password {
+    text-align: center;
+    margin-top: 16px;
+
+    a {
+      color: var(--ion-color-primary);
+      text-decoration: none;
+      font-size: 14px;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (min-width: 768px) {
+  .login-form {
+    padding: 24px;
+  }
+}

@@ -1,0 +1,170 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/bookings"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Détails de la réservation</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div *ngIf="!bookingData" class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Chargement des détails...</p>
+  </div>
+
+  <div *ngIf="bookingData">
+    <!-- En-tête avec statut -->
+    <div class="booking-header">
+      <ion-badge
+        [color]="getStatusColor(bookingData.booking.status)"
+        class="status-badge"
+      >
+        {{ getStatusLabel(bookingData.booking.status) }}
+      </ion-badge>
+      <h1>Réservation #{{ bookingData.booking.id.slice(-6) }}</h1>
+      <p class="booking-date">
+        <ion-icon name="calendar-outline"></ion-icon>
+        {{ bookingData.booking.date | date : "dd/MM/yyyy à HH:mm" }}
+      </p>
+    </div>
+
+    <!-- Détails du service -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Service réservé</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item
+          lines="none"
+          class="service-item"
+          [routerLink]="['/services', bookingData.service.id]"
+        >
+          <ion-thumbnail
+            slot="start"
+            *ngIf="
+              bookingData.service.images && bookingData.service.images.length
+            "
+          >
+            <img
+              [src]="bookingData.service.images[0]"
+              alt="{{ bookingData.service.title }}"
+            />
+          </ion-thumbnail>
+          <ion-label>
+            <h2>{{ bookingData.service.title }}</h2>
+            <p>
+              {{ bookingData.service.description | slice : 0 : 100
+              }}{{ bookingData.service.description.length > 100 ? "..." : "" }}
+            </p>
+            <p class="price">
+              {{
+                bookingData.service.price
+                  | currency : "DZD" : "symbol" : "1.0-0"
+              }}
+            </p>
+          </ion-label>
+          <ion-icon name="chevron-forward" slot="end"></ion-icon>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Détails du prestataire -->
+    <ion-card *ngIf="provider">
+      <ion-card-header>
+        <ion-card-title>Prestataire</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item
+          lines="none"
+          class="provider-item"
+          [routerLink]="['/provider', provider.uid]"
+        >
+          <ion-avatar slot="start">
+            <img
+              [src]="provider.photoURL || 'assets/images/default-avatar.png'"
+              alt="{{ provider.displayName }}"
+            />
+          </ion-avatar>
+          <ion-label>
+            <h2>{{ provider.displayName }}</h2>
+            <p *ngIf="provider.phone">{{ provider.phone }}</p>
+            <p *ngIf="provider.email">{{ provider.email }}</p>
+          </ion-label>
+          <ion-icon
+            name="chatbubble-outline"
+            slot="end"
+            [routerLink]="['/chat', 'new', provider.uid]"
+          ></ion-icon>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Détails du paiement -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Paiement</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="payment-details">
+          <div class="payment-row">
+            <span>Prix du service</span>
+            <span>{{
+              bookingData.service.price | currency : "DZD" : "symbol" : "1.0-0"
+            }}</span>
+          </div>
+          <div class="payment-row" *ngIf="bookingData.booking.extraFees">
+            <span>Frais supplémentaires</span>
+            <span>{{
+              bookingData.booking.extraFees
+                | currency : "DZD" : "symbol" : "1.0-0"
+            }}</span>
+          </div>
+          <div class="payment-row total">
+            <span>Total</span>
+            <span>{{
+              bookingData.booking.totalPrice
+                | currency : "DZD" : "symbol" : "1.0-0"
+            }}</span>
+          </div>
+        </div>
+
+        <!-- Historique des paiements -->
+      </ion-card-content></ion-card
+    >
+  </div>
+  <div class="booking-actions ion-padding" *ngIf="bookingData">
+    <!-- Provider Actions -->
+    <div *ngIf="isProvider">
+      <ion-button
+        expand="block"
+        color="primary"
+        (click)="acceptBooking()"
+        *ngIf="bookingData.booking.status === 'pending'"
+      >
+        Accepter la réservation
+      </ion-button>
+
+      <ion-button
+        expand="block"
+        color="success"
+        (click)="markAwaitingCompletion()"
+        *ngIf="bookingData.booking.status === 'confirmed'"
+      >
+        Marquer comme en attente de validation
+      </ion-button>
+    </div>
+
+    <!-- Client Actions -->
+    <div *ngIf="!isProvider">
+      <ion-button
+        expand="block"
+        color="success"
+        (click)="completeBooking()"
+        *ngIf="bookingData.booking.status === 'awaiting_completion'"
+      >
+        Confirmer service terminé
+      </ion-button>
+    </div>
+  </div></ion-content
+>

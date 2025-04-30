@@ -1,0 +1,107 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Mes réservations</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="activeSegment" (ionChange)="segmentChanged($event)">
+      <ion-segment-button value="all">
+        <ion-label>Toutes</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="pending">
+        <ion-label>En attente</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="confirmed">
+        <ion-label>Confirmées</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="completed">
+        <ion-label>Terminées</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="canceled">
+        <ion-label>Annulées</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Loading state -->
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Chargement de vos réservations...</p>
+  </div>
+
+  <!-- Error message -->
+  <ion-card *ngIf="error && !isLoading" color="danger">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        Erreur
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p>{{ error }}</p>
+      <ion-button expand="block" (click)="loadBookings()" class="ion-margin-top">
+        Réessayer
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Content when loaded -->
+  <div *ngIf="!isLoading && !error">
+    <ng-container *ngIf="bookings.length > 0; else noBookings">
+      <ng-container *ngIf="getFilteredBookings().length > 0; else noFilteredBookings">
+        <ion-list>
+          <ion-item *ngFor="let booking of getFilteredBookings()" [routerLink]="['/bookings', booking.id]" detail="true">
+            <ion-thumbnail slot="start" *ngIf="booking.serviceImage">
+              <img [src]="booking.serviceImage" alt="Service Image">
+            </ion-thumbnail>
+            <ion-label>
+              <h2>{{ booking.serviceName || 'Service sans nom' }}</h2>
+              <p>{{ booking.date | date:'dd/MM/yyyy à HH:mm' }}</p>
+              <p>
+                <ion-badge [color]="getStatusColor(booking.status)">
+                  {{ getStatusLabel(booking.status) }}
+                </ion-badge>
+                <span class="price">{{ booking.totalPrice | currency:'DZD':'symbol':'1.0-0' }}</span>
+              </p>
+            </ion-label>
+            <ion-buttons slot="end" *ngIf="booking.status === 'pending'">
+              <ion-button [routerLink]="['/bookings', booking.id, 'payment']" color="primary">
+                <ion-icon name="wallet-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </ion-item>
+        </ion-list>
+      </ng-container>
+      
+      <ng-template #noFilteredBookings>
+        <div class="empty-state">
+          <ion-icon name="calendar-outline"></ion-icon>
+          <h3>Aucune réservation {{ activeSegment !== 'all' ? getStatusLabel(activeSegment).toLowerCase() : '' }}</h3>
+          <p>Vous n'avez pas encore de réservations {{ activeSegment !== 'all' ? getStatusLabel(activeSegment).toLowerCase() + 's' : '' }}.</p>
+          <ion-button routerLink="/services" expand="block">
+            Découvrir des services
+          </ion-button>
+        </div>
+      </ng-template>
+    </ng-container>
+    
+    <ng-template #noBookings>
+      <div class="empty-state">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <h3>Aucune réservation</h3>
+        <p>Vous n'avez pas encore effectué de réservation.</p>
+        <ion-button routerLink="/services" expand="block">
+          Découvrir des services
+        </ion-button>
+      </div>
+    </ng-template>
+  </div>
+</ion-content>

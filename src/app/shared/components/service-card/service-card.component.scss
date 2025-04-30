@@ -1,0 +1,99 @@
+:host {
+  display: block;
+}
+
+.service-card {
+  margin: 1rem;
+  border-radius: var(--ion-border-radius);
+  box-shadow: var(--ion-box-shadow);
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+  }
+
+  .service-image {
+    height: 200px;
+    object-fit: cover;
+  }
+
+  ion-card-header {
+    padding: 0;
+    
+    ion-item {
+      --padding-start: 0;
+      --inner-padding-end: 0;
+    }
+
+    ion-avatar {
+      width: 40px;
+      height: 40px;
+      margin: 8px;
+    }
+
+    h3 {
+      font-weight: bold;
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    p {
+      color: var(--ion-color-medium);
+      margin: 4px 0 0;
+      font-size: 0.9rem;
+    }
+  }
+
+  ion-card-content {
+    padding: 16px;
+
+    .description {
+      margin: 0 0 16px;
+      color: var(--ion-color-dark);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .service-info {
+      margin: 16px 0;
+
+      ion-item {
+        --min-height: 32px;
+        --padding-start: 0;
+        
+        ion-icon {
+          margin-right: 8px;
+          color: var(--ion-color-medium);
+        }
+
+        ion-label {
+          margin: 0;
+          font-size: 0.9rem;
+          color: var(--ion-color-medium);
+        }
+      }
+    }
+
+    .price-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--ion-color-light);
+
+      .price {
+        font-size: 1.4rem;
+        font-weight: bold;
+      }
+
+      ion-button {
+        margin: 0;
+      }
+    }
+  }
+}

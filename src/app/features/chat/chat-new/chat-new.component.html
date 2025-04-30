@@ -1,0 +1,57 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/chat"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Nouvelle conversation</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Chargement...</p>
+  </div>
+
+  <div *ngIf="error && !isLoading" class="error-container">
+    <ion-icon name="alert-circle-outline"></ion-icon>
+    <h2>Une erreur est survenue</h2>
+    <p>{{ error }}</p>
+    <ion-button expand="block" routerLink="/chat">
+      Retour aux conversations
+    </ion-button>
+  </div>
+
+  <div *ngIf="!isLoading && !error && otherUser" class="new-chat-container">
+    <div class="user-info">
+      <ion-avatar>
+        <img [src]="otherUser.photoURL || 'assets/default-avatar.png'" alt="Photo de profil">
+      </ion-avatar>
+      <h2>{{ otherUser.displayName || 'Utilisateur' }}</h2>
+      <p *ngIf="otherUser.businessName">{{ otherUser.businessName }}</p>
+    </div>
+
+    <div class="message-form">
+      <h3>Démarrer la conversation</h3>
+      <p class="hint">Envoyez un premier message pour commencer la conversation avec ce prestataire.</p>
+      
+      <ion-item>
+        <ion-label position="floating">Votre message</ion-label>
+        <ion-textarea 
+          [(ngModel)]="initialMessage" 
+          rows="4"
+          placeholder="Bonjour, je suis intéressé par vos services...">
+        </ion-textarea>
+      </ion-item>
+      
+      <ion-button 
+        expand="block" 
+        (click)="startConversation()" 
+        [disabled]="!initialMessage.trim() || isLoading"
+        class="submit-button">
+        <ion-icon name="send" slot="start"></ion-icon>
+        Envoyer
+      </ion-button>
+    </div>
+  </div>
+</ion-content>

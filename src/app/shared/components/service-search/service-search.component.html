@@ -1,0 +1,77 @@
+<ion-content>
+  <form [formGroup]="searchForm">
+    <ion-searchbar 
+      formControlName="query"
+      placeholder="Rechercher un service..."
+      animated="true"
+      debounce="300">
+    </ion-searchbar>
+
+    <ion-item>
+      <ion-label>Catégories</ion-label>
+      <ion-select formControlName="categories" multiple="true" interface="action-sheet">
+        <ion-select-option *ngFor="let category of categories" [value]="category.id">
+          {{ category.name }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Prix minimum</ion-label>
+      <ion-input 
+        type="number" 
+        formControlName="priceMin"
+        inputmode="numeric"
+        min="0">
+      </ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Prix maximum</ion-label>
+      <ion-input 
+        type="number" 
+        formControlName="priceMax"
+        inputmode="numeric"
+        min="0">
+      </ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Note minimum</ion-label>
+      <ion-range 
+        formControlName="rating"
+        min="0"
+        max="5"
+        step="0.5"
+        snaps="true"
+        ticks="true"
+        color="warning">
+        <ion-icon slot="start" name="star-outline"></ion-icon>
+        <ion-icon slot="end" name="star"></ion-icon>
+      </ion-range>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Trier par</ion-label>
+      <ion-select formControlName="sort" interface="action-sheet">
+        <ion-select-option *ngFor="let option of sortOptions" [value]="option.value">
+          {{ option.label }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Localisation</ion-label>
+      <ion-input 
+        type="text" 
+        formControlName="location"
+        placeholder="Entrez une ville ou une région">
+      </ion-input>
+    </ion-item>
+
+    <ion-button expand="block" fill="clear" (click)="clearFilters()">
+      <ion-icon name="refresh" slot="start"></ion-icon>
+      Réinitialiser les filtres
+    </ion-button>
+  </form>
+</ion-content>

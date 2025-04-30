@@ -1,0 +1,56 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/profile"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Tableau de bord</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment value="stats" (ionChange)="segmentChanged($event)">
+      <ion-segment-button value="stats" [routerLink]="['/dashboard/stats']">
+        <ion-label>Statistiques</ion-label>
+        <ion-icon name="stats-chart-outline"></ion-icon>
+      </ion-segment-button>
+      <ion-segment-button value="reviews" [routerLink]="['/dashboard/reviews']">
+        <ion-label>Avis</ion-label>
+        <ion-icon name="star-outline"></ion-icon>
+      </ion-segment-button>
+      <ion-segment-button
+        value="services"
+        [routerLink]="['/dashboard/services']"
+      >
+        <ion-label>Services</ion-label>
+        <ion-icon name="briefcase-outline"></ion-icon>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ng-container *ngIf="user as user; else loading">
+    <div *ngIf="isProvider; else notProvider">
+      <router-outlet></router-outlet>
+    </div>
+
+    <ng-template #notProvider>
+      <div class="not-provider-container">
+        <ion-icon name="alert-circle-outline" size="large"></ion-icon>
+        <h2>Accès limité</h2>
+        <p>
+          Vous devez être un prestataire de services pour accéder au tableau de
+          bord.
+        </p>
+        <ion-button expand="block" routerLink="/profile"
+          >Retour au profil</ion-button
+        >
+      </div>
+    </ng-template>
+  </ng-container>
+
+  <ng-template #loading>
+    <div class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Chargement...</p>
+    </div>
+  </ng-template>
+</ion-content>

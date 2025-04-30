@@ -1,0 +1,97 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Profil Prestataire</ion-title>
+    <ion-buttons slot="end" *ngIf="isCurrentUser">
+      <ion-button routerLink="/settings">
+        <ion-icon name="settings-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ng-container *ngIf="provider$ | async as provider; else loading">
+    <!-- En-tête du profil -->
+    <div class="profile-header">
+      <ion-avatar class="profile-avatar">
+        <img [src]="provider.photoURL || 'assets/default-avatar.png'" alt="Photo de profil">
+      </ion-avatar>
+      
+      <div class="profile-info">
+        <h1>{{ provider.displayName }}</h1>
+        <p class="profession">{{ provider.businessName || 'Prestataire' }}</p>
+        <p class="location">
+          <ion-icon name="location"></ion-icon>
+          {{ provider.address?.city || 'Non spécifié' }}
+        </p>
+      </div>
+
+      <div class="profile-actions" *ngIf="!isCurrentUser">
+        <ion-button expand="block" (click)="contactProvider()">
+          <ion-icon name="chatbubble-outline" slot="start"></ion-icon>
+          Contacter
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- Segments pour la navigation -->
+    <ion-segment [(ngModel)]="segment" (ionChange)="segmentChanged($event)" class="ion-padding-vertical">
+      <ion-segment-button value="services">
+        <ion-label>Services</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="stats" *ngIf="isCurrentUser">
+        <ion-label>Statistiques</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="reviews">
+        <ion-label>Avis</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+    <!-- Contenu des segments -->
+    <div [ngSwitch]="segment">
+      <!-- Services -->
+      <div *ngSwitchCase="'services'">
+        <ng-container *ngIf="services$ | async as services">
+          <div class="services-grid">
+            <app-service-card 
+              *ngFor="let service of services"
+              [service]="service"
+              class="service-card">
+            </app-service-card>
+          </div>
+
+          <div *ngIf="services.length === 0" class="empty-state">
+            <ion-icon name="briefcase-outline" size="large"></ion-icon>
+            <p>Aucun service disponible</p>
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- Statistiques -->
+      <div *ngSwitchCase="'stats'">
+        <app-provider-stats 
+          *ngIf="isCurrentUser"
+          [providerId]="providerId">
+        </app-provider-stats>
+      </div>
+
+      <!-- Avis -->
+      <div *ngSwitchCase="'reviews'">
+        <app-user-reviews
+          [providerId]="providerId">
+        </app-user-reviews>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- État de chargement -->
+  <ng-template #loading>
+    <div class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Chargement du profil...</p>
+    </div>
+  </ng-template>
+</ion-content>

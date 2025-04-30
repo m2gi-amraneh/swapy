@@ -1,0 +1,211 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/services"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Réserver un service</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ng-container *ngIf="service$ | async as service">
+    <!-- Détails du service -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-subtitle>{{ service.category }}</ion-card-subtitle>
+        <ion-card-title>{{ service.title }}</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <div class="service-info">
+          <ion-chip color="primary">
+            <ion-icon name="cash-outline"></ion-icon>
+            <ion-label>{{ service.price }} DZD</ion-label>
+          </ion-chip>
+
+          <ion-chip color="medium">
+            <ion-icon name="time-outline"></ion-icon>
+            <ion-label>{{ service.duration }} min</ion-label>
+          </ion-chip>
+        </div>
+
+        <p class="service-description">{{ service.description }}</p>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Informations du prestataire -->
+    <ion-card *ngIf="provider$ | async as provider">
+      <ion-item lines="none">
+        <ion-avatar slot="start">
+          <img
+            [src]="provider.photoURL || 'assets/default-avatar.png'"
+            alt="Photo de profil"
+          />
+        </ion-avatar>
+        <ion-label>
+          <h2>{{ provider.displayName }}</h2>
+          <p>{{ provider.businessName || "Prestataire" }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-card>
+
+    <!-- Information sur le portefeuille -->
+    <ion-card *ngIf="wallet$ | async as wallet">
+      <ion-card-header>
+        <ion-card-subtitle>Votre portefeuille</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="wallet-info">
+          <ion-item lines="none">
+            <ion-icon
+              name="wallet-outline"
+              slot="start"
+              color="primary"
+            ></ion-icon>
+            <ion-label>Solde disponible</ion-label>
+            <ion-note
+              slot="end"
+              [color]="hasSufficientFunds ? 'success' : 'danger'"
+            >
+              {{ getWalletBalance() }}
+            </ion-note>
+          </ion-item>
+
+          <ion-item *ngIf="!hasSufficientFunds && service" lines="none">
+            <ion-icon
+              name="alert-circle-outline"
+              slot="start"
+              color="danger"
+            ></ion-icon>
+            <ion-label color="danger">
+              Solde insuffisant pour ce service ({{ service.price }} DZD)
+            </ion-label>
+          </ion-item>
+
+          <ion-button
+            *ngIf="!hasSufficientFunds"
+            expand="block"
+            fill="outline"
+            color="primary"
+            routerLink="/wallet/deposit"
+          >
+            <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+            Recharger mon portefeuille
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Formulaire de réservation -->
+    <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()">
+      <!-- Sélection de la date -->
+      <ion-item>
+        <ion-label position="stacked">Date du service</ion-label>
+        <ion-datetime
+          formControlName="date"
+          [min]="selectedDate"
+          [max]="'2025'"
+          display-format="DD/MM/YYYY"
+          picker-format="DD/MM/YYYY"
+          (ionChange)="onDateChange($event)"
+          cancelText="Annuler"
+          doneText="Valider"
+        >
+        </ion-datetime>
+      </ion-item>
+
+      <!-- Sélection du créneau horaire -->
+      <ion-list>
+        <ion-radio-group formControlName="timeSlot">
+          <ion-list-header>
+            <ion-label>Créneaux horaires disponibles</ion-label>
+          </ion-list-header>
+
+          <ion-item *ngFor="let slot of timeSlots">
+            <ion-label>{{ getTimeSlotLabel(slot) }}</ion-label>
+            <ion-radio [value]="slot.start" [disabled]="!isSlotAvailable(slot)">
+            </ion-radio>
+          </ion-item>
+        </ion-radio-group>
+      </ion-list>
+
+      <!-- Description de la demande -->
+      <ion-item>
+        <ion-label position="stacked">Description de votre besoin</ion-label>
+        <ion-textarea
+          formControlName="description"
+          rows="4"
+          placeholder="Décrivez votre besoin en détail..."
+        >
+        </ion-textarea>
+      </ion-item>
+
+      <!-- Adresse -->
+      <ion-item>
+        <ion-label position="stacked">Adresse</ion-label>
+        <ion-input
+          formControlName="address"
+          type="text"
+          placeholder="Votre adresse complète"
+        >
+        </ion-input>
+      </ion-item>
+
+      <!-- Numéro de téléphone -->
+      <ion-item>
+        <ion-label position="stacked">Numéro de téléphone</ion-label>
+        <ion-input
+          formControlName="phone"
+          type="tel"
+          placeholder="Ex: 0555123456"
+        >
+        </ion-input>
+      </ion-item>
+
+      <!-- Mode de paiement -->
+      <ion-list>
+        <ion-radio-group formControlName="paymentMethod">
+          <ion-list-header>
+            <ion-label>Mode de paiement</ion-label>
+          </ion-list-header>
+
+          <!-- Paiement par portefeuille électronique -->
+          <ion-item>
+            <ion-label>
+              Paiement par portefeuille
+              <ion-note *ngIf="hasSufficientFunds" color="success"
+                >(Solde disponible)</ion-note
+              >
+            </ion-label>
+            <ion-radio
+              value="wallet"
+              [disabled]="!hasSufficientFunds"
+            ></ion-radio>
+          </ion-item>
+
+          <ion-item>
+            <ion-label>Paiement en espèces</ion-label>
+            <ion-radio value="cash"></ion-radio>
+          </ion-item>
+        </ion-radio-group>
+      </ion-list>
+
+      <!-- Bouton de soumission -->
+      <ion-button
+        expand="block"
+        type="submit"
+        [disabled]="bookingForm.invalid || isLoading"
+        class="ion-margin-vertical"
+      >
+        <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+        <span *ngIf="!isLoading">Confirmer la réservation</span>
+      </ion-button>
+    </form>
+  </ng-container>
+
+  <!-- État de chargement -->
+  <div *ngIf="!(service$ | async)" class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Chargement des informations...</p>
+  </div>
+</ion-content>

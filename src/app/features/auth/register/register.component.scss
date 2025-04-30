@@ -1,0 +1,81 @@
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  background: var(--ion-color-light);
+  border-radius: 8px;
+
+  .user-type-selector {
+    margin-bottom: 16px;
+
+    ion-segment {
+      background: var(--ion-color-light);
+      border-radius: 8px;
+      
+      ion-segment-button {
+        --background-checked: var(--ion-color-primary);
+        --color-checked: var(--ion-color-primary-contrast);
+        --indicator-color: transparent;
+        
+        &::part(indicator) {
+          display: none;
+        }
+      }
+    }
+  }
+
+  ion-list {
+    background: transparent;
+    padding: 0;
+
+    ion-item {
+      --background: var(--ion-color-light);
+      --border-color: var(--ion-color-medium);
+      --border-radius: 8px;
+      --padding-start: 16px;
+      --padding-end: 16px;
+      margin-bottom: 8px;
+
+      &.ion-invalid.ion-touched {
+        --border-color: var(--ion-color-danger);
+      }
+
+      ion-label {
+        color: var(--ion-color-medium);
+      }
+
+      ion-input {
+        --padding-start: 8px;
+        --padding-end: 8px;
+      }
+
+      ion-checkbox {
+        margin-right: 16px;
+      }
+    }
+  }
+
+  .error-message {
+    padding: 0 16px;
+    margin-bottom: 8px;
+    font-size: 12px;
+  }
+
+  ion-button {
+    margin: 16px 0;
+    height: 48px;
+    --border-radius: 8px;
+
+    ion-spinner {
+      margin-right: 8px;
+    }
+  }
+}
+
+// Responsive design
+@media (min-width: 768px) {
+  .register-form {
+    padding: 24px;
+  }
+}

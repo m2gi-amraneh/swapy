@@ -1,0 +1,228 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Profil</ion-title>
+    <ion-buttons slot="end">
+      <ion-button routerLink="/notifications">
+        <ion-icon name="notifications-outline"></ion-icon>
+      </ion-button>
+      <ion-button routerLink="/wallet">
+        <ion-icon name="wallet-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ng-container *ngIf="(user$ | async) as user; else notLoggedIn">
+    <div class="profile-header">
+      <div class="profile-avatar">
+        <ion-avatar>
+          <img [src]="user.photoURL || 'assets/default-avatar.png'" alt="Photo de profil">
+        </ion-avatar>
+      </div>
+      <div class="profile-info">
+        <h2>{{ user.displayName }}</h2>
+        <p>{{ user.email }}</p>
+        <div class="profile-badges">
+          <ion-badge color="primary" *ngIf="isProvider">Prestataire</ion-badge>
+          <ion-badge color="secondary" *ngIf="!isProvider">Client</ion-badge>
+        </div>
+      </div>
+    </div>
+
+    <ion-segment [(ngModel)]="activeSegment" (ionChange)="segmentChanged($event)">
+      <ion-segment-button value="info">
+        <ion-label>Informations</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="bookings">
+        <ion-label>Réservations</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="services" *ngIf="isProvider">
+        <ion-label>Services</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+    <!-- Informations personnelles -->
+    <div *ngIf="activeSegment === 'info'" class="segment-content">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Informations personnelles</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-list lines="full">
+            <ion-item>
+              <ion-label position="stacked">Nom complet</ion-label>
+              <ion-input [value]="user.displayName" readonly></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label position="stacked">Email</ion-label>
+              <ion-input [value]="user.email" readonly></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label position="stacked">Téléphone</ion-label>
+              <ion-input [value]="user.phone || 'Non renseigné'" readonly></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label position="stacked">Adresse</ion-label>
+              <ion-input [value]="user.address?.street || 'Non renseignée'" readonly></ion-input>
+            </ion-item>
+          </ion-list>
+          <div class="action-buttons">
+            <ion-button expand="block" routerLink="/profile/edit">
+              Modifier le profil
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Portefeuille</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div *ngIf="(wallet$ | async) as wallet" class="wallet-info">
+            <div class="wallet-balance">
+              <h3>Solde actuel</h3>
+              <p class="balance">{{ wallet.balance | currency:'DZD':'symbol':'1.0-0' }}</p>
+            </div>
+            <div class="action-buttons">
+              <ion-button expand="block" routerLink="/wallet">
+                Gérer mon portefeuille
+              </ion-button>
+            </div>
+          </div>
+          <div *ngIf="!(wallet$ | async)" class="wallet-info">
+            <p>Chargement du portefeuille...</p>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card *ngIf="!isProvider">
+        <ion-card-header>
+          <ion-card-title>Devenir prestataire</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p>Vous souhaitez proposer vos services sur notre plateforme ?</p>
+          <div class="action-buttons">
+            <ion-button expand="block" (click)="becomeProvider()">
+              Devenir prestataire
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <div class="profile-actions">
+        <ion-button expand="block" fill="outline" routerLink="/profile/edit">
+          <ion-icon name="create-outline" slot="start"></ion-icon>
+          Modifier le profil
+        </ion-button>
+        
+        <ion-button expand="block" color="primary" routerLink="/dashboard" *ngIf="isProvider">
+          <ion-icon name="stats-chart-outline" slot="start"></ion-icon>
+          Tableau de bord
+        </ion-button>
+        
+        <ion-button expand="block" color="danger" (click)="logout()">
+          <ion-icon name="log-out-outline" slot="start"></ion-icon>
+          Déconnexion
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- Réservations -->
+    <div *ngIf="activeSegment === 'bookings'" class="segment-content">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Mes réservations</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ng-container *ngIf="(userBookings$ | async) as bookings">
+            <div *ngIf="bookings.length > 0; else noBookings">
+              <ion-list>
+                <ion-item *ngFor="let booking of bookings" [routerLink]="['/bookings', booking.id]">
+                  <ion-label>
+                    <h2>{{ booking.serviceName }}</h2>
+                    <p>Date: {{ booking.date | date:'dd/MM/yyyy' }}</p>
+                    <p>Statut: 
+                      <ion-badge 
+                        [color]="booking.status === 'confirmed' ? 'success' : 
+                                (booking.status === 'pending' ? 'warning' : 'danger')">
+                        {{ booking.status === 'confirmed' ? 'Confirmée' : 
+                           (booking.status === 'pending' ? 'En attente' : 'Annulée') }}
+                      </ion-badge>
+                    </p>
+                  </ion-label>
+                  <ion-icon name="chevron-forward" slot="end"></ion-icon>
+                </ion-item>
+              </ion-list>
+            </div>
+            <ng-template #noBookings>
+              <div class="empty-state">
+                <ion-icon name="calendar-outline"></ion-icon>
+                <p>Vous n'avez pas encore de réservations</p>
+                <ion-button expand="block" routerLink="/services">
+                  Découvrir les services
+                </ion-button>
+              </div>
+            </ng-template>
+          </ng-container>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Services (pour les prestataires) -->
+    <div *ngIf="activeSegment === 'services' && isProvider" class="segment-content">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Mes services</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ng-container *ngIf="(userServices$ | async) as services">
+            <div *ngIf="services.length > 0; else noServices">
+              <div class="services-grid">
+                <app-service-card 
+                  *ngFor="let service of services" 
+                  [service]="service">
+                </app-service-card>
+              </div>
+            </div>
+            <ng-template #noServices>
+              <div class="empty-state">
+                <ion-icon name="briefcase-outline"></ion-icon>
+                <p>Vous n'avez pas encore ajouté de services</p>
+                <ion-button expand="block" routerLink="/services/create">
+                  Ajouter un service
+                </ion-button>
+              </div>
+            </ng-template>
+          </ng-container>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </ng-container>
+
+  <ng-template #notLoggedIn>
+    <div *ngIf="isLoading" class="loading-container">
+      <ion-skeleton-text animated style="width: 100%; height: 200px;"></ion-skeleton-text>
+      <ion-skeleton-text animated style="width: 100%; height: 200px;"></ion-skeleton-text>
+    </div>
+    <div *ngIf="!isLoading" class="not-logged-in">
+      <ion-icon name="person-circle-outline"></ion-icon>
+      <h2>Connectez-vous pour accéder à votre profil</h2>
+      <div class="action-buttons">
+        <ion-button expand="block" routerLink="/auth/login">
+          Se connecter
+        </ion-button>
+        <ion-button expand="block" fill="outline" routerLink="/auth/register">
+          Créer un compte
+        </ion-button>
+      </div>
+    </div>
+  </ng-template>
+</ion-content>
+
+

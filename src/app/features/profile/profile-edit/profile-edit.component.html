@@ -1,0 +1,70 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/profile"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Modifier le profil</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-skeleton-text animated style="width: 100%; height: 200px;"></ion-skeleton-text>
+    <ion-skeleton-text animated style="width: 100%; height: 200px;"></ion-skeleton-text>
+  </div>
+
+  <div *ngIf="!isLoading" class="edit-profile-container">
+    <div class="profile-image-container">
+      <div class="profile-image">
+        <img [src]="previewUrl || 'assets/default-avatar.png'" alt="Photo de profil">
+        <div class="image-upload-overlay">
+          <label for="file-upload">
+            <ion-icon name="camera"></ion-icon>
+          </label>
+          <input id="file-upload" type="file" accept="image/*" (change)="onFileSelected($event)">
+        </div>
+      </div>
+      <p class="image-hint">Cliquez sur l'image pour la modifier</p>
+    </div>
+
+    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+      <ion-list lines="full">
+        <ion-item>
+          <ion-label position="stacked">Nom complet <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input formControlName="displayName" type="text" placeholder="Votre nom complet"></ion-input>
+          <ion-note slot="error" *ngIf="profileForm.get('displayName')?.invalid && profileForm.get('displayName')?.touched">
+            Le nom est requis
+          </ion-note>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Numéro de téléphone</ion-label>
+          <ion-input formControlName="phoneNumber" type="tel" placeholder="Votre numéro de téléphone"></ion-input>
+          <ion-note slot="error" *ngIf="profileForm.get('phoneNumber')?.invalid && profileForm.get('phoneNumber')?.touched">
+            Numéro de téléphone invalide
+          </ion-note>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Adresse</ion-label>
+          <ion-input formControlName="address" type="text" placeholder="Votre adresse"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Bio</ion-label>
+          <ion-textarea formControlName="bio" rows="4" placeholder="Parlez-nous de vous..."></ion-textarea>
+        </ion-item>
+      </ion-list>
+
+      <div class="form-actions">
+        <ion-button expand="block" type="submit" [disabled]="profileForm.invalid || isSaving">
+          <ion-spinner *ngIf="isSaving" name="crescent"></ion-spinner>
+          <span *ngIf="!isSaving">Enregistrer</span>
+        </ion-button>
+        <ion-button expand="block" fill="outline" type="button" (click)="cancel()">
+          Annuler
+        </ion-button>
+      </div>
+    </form>
+  </div>
+</ion-content>

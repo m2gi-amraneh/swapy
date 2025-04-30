@@ -1,0 +1,108 @@
+<form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+  <div class="user-type-selector">
+    <ion-segment [(ngModel)]="userType" [ngModelOptions]="{standalone: true}">
+      <ion-segment-button value="client">
+        <ion-label>Client</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="provider">
+        <ion-label>Prestataire</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+
+  <ion-list>
+    <ion-item>
+      <ion-label position="floating">Prénom</ion-label>
+      <ion-input type="text" formControlName="firstName"></ion-input>
+    </ion-item>
+    <div class="error-message" *ngIf="registerForm.get('firstName')?.touched && registerForm.get('firstName')?.invalid">
+      <ion-text color="danger" *ngIf="registerForm.get('firstName')?.errors?.['required']">
+        Le prénom est requis
+      </ion-text>
+      <ion-text color="danger" *ngIf="registerForm.get('firstName')?.errors?.['minlength']">
+        Le prénom doit contenir au moins 2 caractères
+      </ion-text>
+    </div>
+
+    <ion-item>
+      <ion-label position="floating">Nom</ion-label>
+      <ion-input type="text" formControlName="lastName"></ion-input>
+    </ion-item>
+    <div class="error-message" *ngIf="registerForm.get('lastName')?.touched && registerForm.get('lastName')?.invalid">
+      <ion-text color="danger" *ngIf="registerForm.get('lastName')?.errors?.['required']">
+        Le nom est requis
+      </ion-text>
+      <ion-text color="danger" *ngIf="registerForm.get('lastName')?.errors?.['minlength']">
+        Le nom doit contenir au moins 2 caractères
+      </ion-text>
+    </div>
+
+    <ion-item>
+      <ion-label position="floating">Email</ion-label>
+      <ion-input type="email" formControlName="email"></ion-input>
+    </ion-item>
+    <div class="error-message" *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid">
+      <ion-text color="danger" *ngIf="registerForm.get('email')?.errors?.['required']">
+        L'email est requis
+      </ion-text>
+      <ion-text color="danger" *ngIf="registerForm.get('email')?.errors?.['email']">
+        Format d'email invalide
+      </ion-text>
+    </div>
+
+    <ion-item>
+      <ion-label position="floating">Téléphone</ion-label>
+      <ion-input type="tel" formControlName="phoneNumber"></ion-input>
+    </ion-item>
+    <div class="error-message" *ngIf="registerForm.get('phoneNumber')?.touched && registerForm.get('phoneNumber')?.invalid">
+      <ion-text color="danger" *ngIf="registerForm.get('phoneNumber')?.errors?.['required']">
+        Le numéro de téléphone est requis
+      </ion-text>
+      <ion-text color="danger" *ngIf="registerForm.get('phoneNumber')?.errors?.['pattern']">
+        Format de numéro invalide (ex: 0555123456 ou +213555123456)
+      </ion-text>
+    </div>
+
+    <ion-item>
+      <ion-label position="floating">Mot de passe</ion-label>
+      <ion-input type="password" formControlName="password"></ion-input>
+    </ion-item>
+    <div class="error-message" *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.invalid">
+      <ion-text color="danger" *ngIf="registerForm.get('password')?.errors?.['required']">
+        Le mot de passe est requis
+      </ion-text>
+      <ion-text color="danger" *ngIf="registerForm.get('password')?.errors?.['minlength']">
+        Le mot de passe doit contenir au moins 6 caractères
+      </ion-text>
+    </div>
+
+    <ion-item>
+      <ion-label position="floating">Confirmer le mot de passe</ion-label>
+      <ion-input type="password" formControlName="confirmPassword"></ion-input>
+    </ion-item>
+    <div class="error-message" *ngIf="registerForm.get('confirmPassword')?.touched && registerForm.errors?.['mismatch']">
+      <ion-text color="danger">
+        Les mots de passe ne correspondent pas
+      </ion-text>
+    </div>
+
+    <ion-item lines="none">
+      <ion-checkbox formControlName="acceptTerms" slot="start"></ion-checkbox>
+      <ion-label>J'accepte les conditions d'utilisation</ion-label>
+    </ion-item>
+    <div class="error-message" *ngIf="registerForm.get('acceptTerms')?.touched && registerForm.get('acceptTerms')?.invalid">
+      <ion-text color="danger">
+        Vous devez accepter les conditions d'utilisation
+      </ion-text>
+    </div>
+  </ion-list>
+
+  <div class="error-message" *ngIf="errorMessage">
+    <ion-text color="danger">{{ errorMessage }}</ion-text>
+  </div>
+
+  <ion-button expand="block" type="submit" [disabled]="registerForm.invalid || isLoading">
+    <ion-spinner name="crescent" *ngIf="isLoading"></ion-spinner>
+    <span *ngIf="!isLoading">S'inscrire</span>
+  </ion-button>
+</form>

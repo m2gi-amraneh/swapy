@@ -1,0 +1,133 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/services"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Create New Service</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Authentication Warning Banner -->
+  <ion-card *ngIf="!currentUserId" color="warning">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        Authentication Required
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p>You are not currently logged in. You can fill out the form, but you'll need to log in before submitting.</p>
+      <ion-button expand="block" color="primary" routerLink="/auth/login" [queryParams]="{returnUrl: '/services/create'}" class="ion-margin-top">
+        Log In Now
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <h1>Create Service</h1>
+  <p>This is the service creation form.</p>
+  
+  <form [formGroup]="serviceForm" (ngSubmit)="onSubmit()">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Service Information</ion-card-title>
+        <ion-card-subtitle>Enter the details of your service</ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+        <ion-item>
+          <ion-label position="floating">Title <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input type="text" formControlName="title"></ion-input>
+          <ion-note slot="error" *ngIf="serviceForm.get('title')?.touched && serviceForm.get('title')?.errors?.['required']">
+            Title is required
+          </ion-note>
+          <ion-note slot="error" *ngIf="serviceForm.get('title')?.touched && serviceForm.get('title')?.errors?.['minlength']">
+            Title must be at least 5 characters
+          </ion-note>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Description <ion-text color="danger">*</ion-text></ion-label>
+          <ion-textarea rows="4" formControlName="description"></ion-textarea>
+          <ion-note slot="error" *ngIf="serviceForm.get('description')?.touched && serviceForm.get('description')?.errors?.['required']">
+            Description is required
+          </ion-note>
+          <ion-note slot="error" *ngIf="serviceForm.get('description')?.touched && serviceForm.get('description')?.errors?.['minlength']">
+            Description must be at least 20 characters
+          </ion-note>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Price (DZD) <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input type="number" formControlName="price"></ion-input>
+          <ion-note slot="error" *ngIf="serviceForm.get('price')?.touched && serviceForm.get('price')?.errors?.['required']">
+            Price is required
+          </ion-note>
+          <ion-note slot="error" *ngIf="serviceForm.get('price')?.touched && serviceForm.get('price')?.errors?.['min']">
+            Price must be a positive number
+          </ion-note>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Category <ion-text color="danger">*</ion-text></ion-label>
+          <ion-select formControlName="category" interface="action-sheet" placeholder="Select a category">
+            <ion-select-option *ngFor="let category of categories$ | async" [value]="category.id">
+              {{ category.name }}
+            </ion-select-option>
+          </ion-select>
+          <ion-note slot="error" *ngIf="serviceForm.get('category')?.touched && serviceForm.get('category')?.errors?.['required']">
+            Category is required
+          </ion-note>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Location <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input type="text" formControlName="location"></ion-input>
+          <ion-note slot="error" *ngIf="serviceForm.get('location')?.touched && serviceForm.get('location')?.errors?.['required']">
+            Location is required
+          </ion-note>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Duration (hours)</ion-label>
+          <ion-input type="number" formControlName="duration"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-label>Images</ion-label>
+        </ion-item>
+
+        <div class="image-upload-container">
+          <div class="image-preview-container" *ngIf="selectedImages.length > 0">
+            <div class="image-preview" *ngFor="let image of selectedImages; let i = index">
+              <img [src]="image" alt="Preview">
+              <ion-button fill="clear" color="danger" (click)="removeImage(i)">
+                <ion-icon name="close-circle"></ion-icon>
+              </ion-button>
+            </div>
+          </div>
+
+          <ion-button expand="block" color="medium" (click)="fileInput.click()">
+            <ion-icon name="image-outline" slot="start"></ion-icon>
+            Add Images
+          </ion-button>
+          <input #fileInput type="file" accept="image/*" multiple (change)="onImageSelected($event)" style="display: none;">
+        </div>
+
+        <ion-item lines="none" *ngIf="errorMessage" color="danger">
+          <ion-label>{{ errorMessage }}</ion-label>
+        </ion-item>
+
+        <div class="ion-padding-top">
+          <ion-button expand="block" type="submit" [disabled]="serviceForm.invalid || isSubmitting">
+            <ion-spinner name="circular" *ngIf="isSubmitting"></ion-spinner>
+            <span *ngIf="!isSubmitting">Create Service</span>
+          </ion-button>
+          <ion-button expand="block" fill="outline" routerLink="/services" class="ion-margin-top">
+            Cancel
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </form>
+</ion-content>
